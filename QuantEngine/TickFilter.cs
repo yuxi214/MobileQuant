@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace QuantEngine
 {
-    class DataManager
+    class TickFilter
     {
     }
 }
