@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace QuantEngine
 {
-    class Order
+    public class Order
     {
-        //报单标识
-        private string orderID = string.Empty;
         //合约
         private string instrumentID = string.Empty;
         //买卖
@@ -24,19 +22,8 @@ namespace QuantEngine
         private int volumeLeft = 0;
         //状态
         private OrderStatus status = OrderStatus.Normal;
-
-        public string OrderID
-        {
-            get
-            {
-                return orderID;
-            }
-
-            set
-            {
-                orderID = value;
-            }
-        }
+        //子订单
+        private List<SubOrder> subOrders = new List<SubOrder>();
 
         public string InstrumentID
         {
@@ -111,7 +98,141 @@ namespace QuantEngine
 
         public override string ToString()
         {
-            return $"{orderID},{instrumentID},{direction},{price},{volume},{volumeLeft},{Status}";
+            return $"{instrumentID},{direction},{price},{volume},{volumeLeft},{Status}";
+        }
+    }
+
+    public class SubOrder
+    {
+		// 报单标识
+        private string orderID = string.Empty;
+
+        // 合约
+        private string instrumentID = string.Empty;
+
+        // 买卖
+        private DirectionType direction;
+
+        // 开平
+        private OffsetType offset;
+
+        // 报价
+        private double limitPrice;
+
+        // 报单时间(交易所)
+        private DateTime insertTime;
+
+        // 报单数量
+        private int volume;
+
+        // 未成交,trade更新
+        private int volumeLeft;
+
+        // 状态
+        private OrderStatus status;
+
+        public string OrderID
+        {
+            get
+            {
+                return orderID;
+            }
+
+            set
+            {
+                orderID = value;
+            }
+        }
+
+        public string InstrumentID
+        {
+            get
+            {
+                return instrumentID;
+            }
+
+            set
+            {
+                instrumentID = value;
+            }
+        }
+
+        public DirectionType Direction
+        {
+            get
+            {
+                return direction;
+            }
+
+            set
+            {
+                direction = value;
+            }
+        }
+
+        public OffsetType Offset
+        {
+            get
+            {
+                return offset;
+            }
+
+            set
+            {
+                offset = value;
+            }
+        }
+
+        public double LimitPrice
+        {
+            get
+            {
+                return limitPrice;
+            }
+
+            set
+            {
+                limitPrice = value;
+            }
+        }
+
+        public int Volume
+        {
+            get
+            {
+                return volume;
+            }
+
+            set
+            {
+                volume = value;
+            }
+        }
+
+        public int VolumeLeft
+        {
+            get
+            {
+                return volumeLeft;
+            }
+
+            set
+            {
+                volumeLeft = value;
+            }
+        }
+
+        public OrderStatus Status
+        {
+            get
+            {
+                return status;
+            }
+
+            set
+            {
+                status = value;
+            }
         }
     }
 
@@ -149,6 +270,22 @@ namespace QuantEngine
         /// <summary>
         /// 错误
         /// </summary>
-        Error,
+        Error
+    }
+
+    public enum OffsetType
+    {
+        /// <summary>
+        /// 开仓
+        /// </summary>
+        Open,
+        /// <summary>
+        /// 平仓
+        /// </summary>
+        Close,
+        /// <summary>
+        /// 平今
+        /// </summary>
+        CloseToday
     }
 }

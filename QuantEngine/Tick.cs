@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace QuantEngine
 {
-    class Tick
+    public class Tick
     {
         // 合约代码;
         private string instrumentID;
@@ -28,8 +28,6 @@ namespace QuantEngine
         private double openInterest;
         //最后修改时间
         private DateTime updateTime;
-        //最后修改毫秒
-        private int updateMillisec;
         //涨停板价
         private double upperLimitPrice;
         //跌停板价
@@ -129,14 +127,6 @@ namespace QuantEngine
             get
             {
                 return updateTime;
-            }
-        }
-
-        public int UpdateMillisec
-        {
-            get
-            {
-                return updateMillisec;
             }
         }
 

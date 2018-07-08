@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace QuantEngine
 {
-    class StrategyManager
+    internal class StrategyManager
     {
     }
 }

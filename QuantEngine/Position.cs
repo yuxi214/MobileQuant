@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace QuantEngine
 {
-    class Position
+    internal class Position
     {
         //合约名
         private string instrumentID = string.Empty;
@@ -27,24 +27,16 @@ namespace QuantEngine
         //空冻结
         private int shortFrozen = 0;
 
-        public Position(string instrumentID)
-        {
-            this.instrumentID = instrumentID;
-        }
-
-        public string InstrumentID
-        {
-            get
-            {
-                return instrumentID;
-            }
-        }
-
         public int TdLongQty
         {
             get
             {
                 return tdLongQty;
+            }
+
+            set
+            {
+                tdLongQty = value > 0 ? value : 0;
             }
         }
 
@@ -54,6 +46,11 @@ namespace QuantEngine
             {
                 return tdLongFrozen;
             }
+
+            set
+            {
+                tdLongFrozen = value > 0 ? value : 0;
+            }
         }
 
         public int LongQty
@@ -61,6 +58,11 @@ namespace QuantEngine
             get
             {
                 return longQty;
+            }
+
+            set
+            {
+                longQty = value > 0 ? value : 0;
             }
         }
 
@@ -70,6 +72,11 @@ namespace QuantEngine
             {
                 return longFrozen;
             }
+
+            set
+            {
+                longFrozen = value > 0 ? value : 0;
+            }
         }
 
         public int TdShortQty
@@ -77,6 +84,11 @@ namespace QuantEngine
             get
             {
                 return tdShortQty;
+            }
+
+            set
+            {
+                tdShortQty = value > 0 ? value : 0;
             }
         }
 
@@ -86,6 +98,11 @@ namespace QuantEngine
             {
                 return tdShortFrozen;
             }
+
+            set
+            {
+                tdShortFrozen = value > 0 ? value : 0;
+            }
         }
 
         public int ShortQty
@@ -93,6 +110,11 @@ namespace QuantEngine
             get
             {
                 return shortQty;
+            }
+
+            set
+            {
+                shortQty = value > 0 ? value : 0;
             }
         }
 
@@ -102,71 +124,18 @@ namespace QuantEngine
             {
                 return shortFrozen;
             }
-        }
 
-        //多开
-        public void LongOpen(int vol)
-        {
-            tdLongQty += vol;
-        }
-
-        //空开
-        public void ShortOpen(int vol)
-        {
-            tdShortQty += vol;
-        }
-
-        //今多开
-        public void TdLongOpen(int vol)
-        {
-            tdLongQty += vol;
-        }
-
-        //今空开
-        public void TdShortOpen(int vol)
-        {
-            tdShortQty += vol;
-        }
-
-        //多平
-        public void LongClose(int vol)
-        {
-            longQty -= vol;
-            if(longQty < 0)
+            set
             {
-                longQty = 0;
-            }
-
-        }
-
-        //空平
-        public void ShortClose(int vol)
-        {
-            shortQty -= vol;
-            if(shortQty < 0)
-            {
-                shortQty = 0;
+                shortFrozen = value > 0 ? value : 0;
             }
         }
 
-        //今多平
-        public void TdLongClose(int vol)
+        public Position(string instrumentID)
         {
-            tdLongQty -= vol;
-            if(tdLongQty < 0)
-            {
-                tdLongQty = 0;
-            }
+            this.instrumentID = instrumentID;
         }
 
-        //今空平
-        public void TdShortClose(int vol)
-        {
-            tdShortQty -= vol;
-            if(tdShortQty < 0)
-            {
-                tdShortQty = 0;
-            }
-        }
+
     }
 }
