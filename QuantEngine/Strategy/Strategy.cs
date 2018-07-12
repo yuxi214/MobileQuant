@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace QuantEngine
 {
-    public class Strategy
+    public partial class Strategy
     {
+        public virtual void OnStart() { }
+        public virtual void OnStop() { }
     }
 }

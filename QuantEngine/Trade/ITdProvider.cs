@@ -8,8 +8,6 @@ namespace QuantEngine
 {
     public interface ITdProvider
     {
-        //连接
-        bool Connect();
         //登陆
         bool Login();
         //登出
