@@ -18,12 +18,8 @@ namespace QuantEngine
         void SubscribeMarketData(String InstrumentID);
         //退订行情
         void UnSubscribeMarketData(String InstrumentID);
-    }
-
-    public class BaseMdProvider
-    {
-        //行情回报
-        public event RtnTick OnTick;
+        //行情回调
+        event RtnTick OnTick;
     }
 
     //委托

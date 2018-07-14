@@ -9,12 +9,14 @@ using HaiFeng;
 
 namespace QuantEngine
 {
-    class CtpMdProvider : BaseMdProvider, IMdProvider
+    class CtpMdProvider :  IMdProvider
     {
         private Account mAccount;
         private Quote mQuoter = new CTPQuote();
 
         private static CtpMdProvider instance = new CtpMdProvider();
+
+        public event RtnTick OnTick;
 
         public static CtpMdProvider Instance
         {
@@ -23,6 +25,8 @@ namespace QuantEngine
                 return instance;
             }
         }
+
+        private CtpMdProvider() { }
 
         //登陆
         public bool Login(Account account)
@@ -38,30 +42,53 @@ namespace QuantEngine
             {
                 _s.WaitOne();
 
-                //
+                //前置连接回调
                 mQuoter.OnFrontConnected += (object sender, EventArgs e) =>
                 {
                     mQuoter.ReqUserLogin(account.Investor, account.Password, account.Broker);
                     Utils.Log("OnFrontConnected");
                 };
+                //登陆回调
                 mQuoter.OnRspUserLogin += (object sender, IntEventArgs e) =>
                 {
                     _s.Release();
                     Utils.Log("OnRspUserLogin:"+e.Value);
                 };
+                //登出回调
                 mQuoter.OnRspUserLogout += (object sender, IntEventArgs e) =>
                 {
                     Utils.Log("OnRspUserLogout");
                 };
+                //行情回调
                 mQuoter.OnRtnTick += (object sender, TickEventArgs e) =>
                 {
+                    MarketData _md = e.Tick;
+
+                    //处理时间
+                    DateTime _time = DateTime.Now;
+                    try
+                    {
+                        _time = DateTime.ParseExact(_md.UpdateTime, "yyyyMMdd HH:mm:ss", System.Globalization.CultureInfo.CurrentCulture);
+                    }
+                    catch(Exception ex)
+                    {
+                        Utils.Log(ex.StackTrace);
+                    }
+                    _time.AddMilliseconds(_md.UpdateMillisec);
+
+
+                    Tick _tick = new Tick(_md.InstrumentID, _md.LastPrice, _md.BidPrice, _md.BidVolume, _md.AskPrice, _md.AskVolume
+                        , _md.AveragePrice, _md.Volume, _md.OpenInterest, _time, _md.UpperLimitPrice, _md.LowerLimitPrice);
+
+                    //发射
+                    OnTick(_tick);
                 };
                 mQuoter.OnRtnError += (object sender, ErrorEventArgs e) =>
                 {
-                    Utils.Log("OnFrontConnected："+e.ErrorMsg);
+                    Utils.Log("OnRtnError：" + e.ErrorMsg);
                 };
 
-                //
+                //开始连接
                 mQuoter.ReqConnect(account.Server);
 
 
@@ -70,6 +97,7 @@ namespace QuantEngine
             //等待登陆结果
             Thread.Sleep(500);
             _s.WaitOne();
+            _s.Release();
             return mQuoter.IsLogin;
 
         }

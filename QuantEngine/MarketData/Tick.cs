@@ -33,7 +33,7 @@ namespace QuantEngine
         //跌停板价
         private double lowerLimitPrice;
 
-        public Tick(string instrumentID, double lastPrice, double bidPrice, int bidVolume, double askPrice, int askVolume, double averagePrice, int volume, double openInterest, DateTime updateTime, int updateMillisec, double upperLimitPrice, double lowerLimitPrice)
+        public Tick(string instrumentID, double lastPrice, double bidPrice, int bidVolume, double askPrice, int askVolume, double averagePrice, int volume, double openInterest, DateTime updateTime, double upperLimitPrice, double lowerLimitPrice)
         {
             this.instrumentID = instrumentID;
             this.lastPrice = lastPrice;
@@ -45,7 +45,6 @@ namespace QuantEngine
             this.volume = volume;
             this.openInterest = openInterest;
             this.updateTime = updateTime;
-            this.updateMillisec = updateMillisec;
             this.upperLimitPrice = upperLimitPrice;
             this.lowerLimitPrice = lowerLimitPrice;
         }
