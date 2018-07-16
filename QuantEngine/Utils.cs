@@ -7,7 +7,7 @@ using System.IO;
 
 namespace QuantEngine
 {
-    class Utils
+    public class Utils
     {
 
         //日志
@@ -25,11 +25,11 @@ namespace QuantEngine
                 {
                     Directory.CreateDirectory(path);
                 }
-                path = path + "\\" + DateTime.Now.ToString("yyyyMMdd");
-                if (!Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(path);
-                }
+                //path = path + "\\" + DateTime.Now.ToString("yyyyMMdd");
+                //if (!Directory.Exists(path))
+                //{
+                //    Directory.CreateDirectory(path);
+                //}
                 path = path + "\\" + DateTime.Now.ToString("yyyyMMdd") + ".txt";
                 if (!File.Exists(path))
                 {

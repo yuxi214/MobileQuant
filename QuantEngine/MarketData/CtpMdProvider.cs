@@ -9,10 +9,10 @@ using HaiFeng;
 
 namespace QuantEngine
 {
-    class CtpMdProvider :  IMdProvider
+    internal class CtpMdProvider : IMdProvider
     {
         private Account mAccount;
-        private Quote mQuoter = new CTPQuote();
+        private CTPQuote mQuoter = new CTPQuote();
 
         private static CtpMdProvider instance = new CtpMdProvider();
 
@@ -29,77 +29,61 @@ namespace QuantEngine
         private CtpMdProvider() { }
 
         //登陆
-        public bool Login(Account account)
+        public void Login(Account account)
         {
             if (account != null && mQuoter.IsLogin)
-                return true;
+                return;
 
             mAccount = account;
 
-            //登陆线程
-            Semaphore _s = new Semaphore(1, 1);
-            new Thread(new ThreadStart(() =>
+            //前置连接回调
+            mQuoter.OnFrontConnected += (object sender, EventArgs e) =>
             {
-                _s.WaitOne();
-
-                //前置连接回调
-                mQuoter.OnFrontConnected += (object sender, EventArgs e) =>
-                {
-                    mQuoter.ReqUserLogin(account.Investor, account.Password, account.Broker);
-                    Utils.Log("OnFrontConnected");
-                };
-                //登陆回调
-                mQuoter.OnRspUserLogin += (object sender, IntEventArgs e) =>
-                {
-                    _s.Release();
-                    Utils.Log("OnRspUserLogin:"+e.Value);
-                };
-                //登出回调
-                mQuoter.OnRspUserLogout += (object sender, IntEventArgs e) =>
-                {
-                    Utils.Log("OnRspUserLogout");
-                };
-                //行情回调
-                mQuoter.OnRtnTick += (object sender, TickEventArgs e) =>
-                {
-                    MarketData _md = e.Tick;
+                mQuoter.ReqUserLogin(account.Investor, account.Password, account.Broker);
+                Utils.Log("ctpmd:OnFrontConnected");
+            };
+            //登陆回调
+            mQuoter.OnRspUserLogin += (object sender, IntEventArgs e) =>
+            {
+                mQuoter.ReqSubscribeMarketData(mSubscribeMap.Keys.ToArray<string>());
+                Utils.Log("ctpmd:OnRspUserLogin:" + e.Value);
+            };
+            //登出回调
+            mQuoter.OnRspUserLogout += (object sender, IntEventArgs e) =>
+            {
+                Utils.Log("ctpmd:OnRspUserLogout");
+            };
+            //行情回调
+            mQuoter.OnRtnTick += (object sender, TickEventArgs e) =>
+            {
+                MarketData _md = e.Tick;
 
                     //处理时间
                     DateTime _time = DateTime.Now;
-                    try
-                    {
-                        _time = DateTime.ParseExact(_md.UpdateTime, "yyyyMMdd HH:mm:ss", System.Globalization.CultureInfo.CurrentCulture);
-                    }
-                    catch(Exception ex)
-                    {
-                        Utils.Log(ex.StackTrace);
-                    }
-                    _time.AddMilliseconds(_md.UpdateMillisec);
-
-
-                    Tick _tick = new Tick(_md.InstrumentID, _md.LastPrice, _md.BidPrice, _md.BidVolume, _md.AskPrice, _md.AskVolume
-                        , _md.AveragePrice, _md.Volume, _md.OpenInterest, _time, _md.UpperLimitPrice, _md.LowerLimitPrice);
-
-                    //发射
-                    OnTick(_tick);
-                };
-                mQuoter.OnRtnError += (object sender, ErrorEventArgs e) =>
+                try
                 {
-                    Utils.Log("OnRtnError：" + e.ErrorMsg);
-                };
+                    _time = DateTime.ParseExact(_md.UpdateTime, "yyyyMMdd HH:mm:ss", System.Globalization.CultureInfo.CurrentCulture);
+                }
+                catch (Exception ex)
+                {
+                    Utils.Log(ex.StackTrace);
+                }
+                _time.AddMilliseconds(_md.UpdateMillisec);
 
-                //开始连接
-                mQuoter.ReqConnect(account.Server);
 
+                Tick _tick = new Tick(_md.InstrumentID, _md.LastPrice, _md.BidPrice, _md.BidVolume, _md.AskPrice, _md.AskVolume
+                    , _md.AveragePrice, _md.Volume, _md.OpenInterest, _time, _md.UpperLimitPrice, _md.LowerLimitPrice);
 
-            })).Start();
+                    //发送
+                    OnTick(_tick);
+            };
+            mQuoter.OnRtnError += (object sender, ErrorEventArgs e) =>
+            {
+                Utils.Log("OnRtnError：" + e.ErrorMsg);
+            };
 
-            //等待登陆结果
-            Thread.Sleep(500);
-            _s.WaitOne();
-            _s.Release();
-            return mQuoter.IsLogin;
-
+            //开始连接
+            mQuoter.ReqConnect(account.Server);
         }
 
         //登出
@@ -113,12 +97,28 @@ namespace QuantEngine
             return mQuoter.IsLogin;
         }
         //订阅行情
-        public void SubscribeMarketData(String instrumentID)
+        private Dictionary<string, bool> mSubscribeMap = new Dictionary<string, bool>();
+        public void SubscribeMarketData(string instrumentID)
         {
-            mQuoter.ReqSubscribeMarketData(instrumentID);
+            //已经订阅了，就不订了
+            bool b = false;
+            mSubscribeMap.TryGetValue(instrumentID, out b);
+            if (b)
+                return;
+
+            //判断登陆状态
+            if (IsLogin())
+            {
+                mQuoter.ReqSubscribeMarketData(instrumentID);
+                mSubscribeMap[instrumentID] = true;
+            }
+            else
+            {
+                mSubscribeMap[instrumentID] = false;
+            }
         }
         //退订行情
-        public void UnSubscribeMarketData(String instrumentID)
+        public void UnSubscribeMarketData(string instrumentID)
         {
             mQuoter.ReqUnSubscribeMarketData(instrumentID);
         }

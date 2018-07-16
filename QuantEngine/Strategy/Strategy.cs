@@ -10,7 +10,7 @@ namespace QuantEngine
     {
         public virtual void OnStart() { }
         public virtual void OnStop() { }
-        public virtual string[] GetInstrumentIDs() { return new string[] { }; }
+        public virtual string[] OnLoadInstrument() { return new string[] { }; }
         public virtual void OnTick(Tick tick) { }
         public virtual void OnPositionChanged(string instrumentID,int position) { }
     }
@@ -24,7 +24,7 @@ namespace QuantEngine
         //发送开始信号
         internal void SendStart()
         {
-            string[] instIDs = GetInstrumentIDs();
+            string[] instIDs = OnLoadInstrument();
             //添加合约
             for(int i=0;i<instIDs.Length;i++)
             {

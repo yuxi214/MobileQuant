@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,7 +10,7 @@ namespace QuantEngine
 {
     internal class StrategyManager
     {
-        private static StrategyManager instance;
+        private static StrategyManager instance = new StrategyManager();
 
         internal static StrategyManager Instance
         {
@@ -18,12 +19,14 @@ namespace QuantEngine
                 return instance;
             }
         }
-        private StrategyManager(){}
+        private StrategyManager()
+        {
+            loadStrategy();
+        }
 
-        #region 行情
         //策略添加
         private Dictionary<string, Strategy> mStrategyMap = new Dictionary<string, Strategy>();
-        internal void AddStrategy(string name, Strategy strategy)
+        internal void addStrategy(string name, Strategy strategy)
         {
             //策略去重
             if (mStrategyMap.ContainsKey(name))
@@ -31,7 +34,7 @@ namespace QuantEngine
 
             //行情映射
             mStrategyMap.Add(name, strategy);
-            string[] instIDs = strategy.GetInstrumentIDs();
+            string[] instIDs = strategy.OnLoadInstrument();
             foreach(string instID in instIDs)
             {
                 HashSet<Strategy> strategySet;
@@ -42,6 +45,24 @@ namespace QuantEngine
 
         }
 
+        private void loadStrategy()
+        {
+            Assembly assembly = Assembly.LoadFrom(AppDomain.CurrentDomain.BaseDirectory + "\\StrategyPackage.dll");
+            Type[] types = assembly.GetTypes();
+            foreach(Type t in types)
+            {
+                if (!t.IsInstanceOfType(typeof(Strategy)))
+                    continue;
+
+                Strategy stg = Activator.CreateInstance(t) as Strategy;
+                if (stg == null)
+                    continue;
+
+                addStrategy(t.Name, stg);
+            }
+        }
+
+        #region 行情
         //获取行情合约
         internal string[] GetInstrumentIDs()
         {

@@ -9,7 +9,7 @@ namespace QuantEngine
     public interface IMdProvider
     {
         //登陆
-        bool Login(Account account);
+        void Login(Account account);
         //登出
         void Logout();
         //是否登陆

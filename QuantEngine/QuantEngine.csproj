@@ -11,12 +11,13 @@
     <AssemblyName>QuantEngine</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\MobileQuant\bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -53,7 +54,7 @@
     <Compile Include="Trade\Position.cs" />
     <Compile Include="Trade\PositionManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="QuantEngine.cs" />
+    <Compile Include="Engine.cs" />
     <Compile Include="Strategy\Strategy.cs" />
     <Compile Include="Strategy\StrategyManager.cs" />
     <Compile Include="MarketData\Tick.cs" />
@@ -63,7 +64,7 @@
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Data\App.config">
+    <None Include="App.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
