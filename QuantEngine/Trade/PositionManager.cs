@@ -8,5 +8,10 @@ namespace QuantEngine
 {
     internal class PositionManager
     {
+        private Dictionary<string, Position> positionMap = new Dictionary<string, Position>();
+        internal void CreateSubOrder(Order order)
+        {
+            order.UpdateOrder
+        }
     }
 }

@@ -58,11 +58,18 @@ namespace QuantEngine
             {
                 MarketData _md = e.Tick;
 
-                    //处理时间
-                    DateTime _time = DateTime.Now;
+                //处理时间
+                DateTime _time = DateTime.Now;
                 try
                 {
-                    _time = DateTime.ParseExact(_md.UpdateTime, "yyyyMMdd HH:mm:ss", System.Globalization.CultureInfo.CurrentCulture);
+                    _time = DateTime.ParseExact(_md.UpdateTime, "HH:mm:ss", System.Globalization.CultureInfo.CurrentCulture);
+                    if((_time-DateTime.Now).TotalHours > 23)
+                    {
+                        _time.AddDays(-1);
+                    }else if((_time - DateTime.Now).TotalHours < -23)
+                    {
+                        _time.AddDays(1);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -74,8 +81,8 @@ namespace QuantEngine
                 Tick _tick = new Tick(_md.InstrumentID, _md.LastPrice, _md.BidPrice, _md.BidVolume, _md.AskPrice, _md.AskVolume
                     , _md.AveragePrice, _md.Volume, _md.OpenInterest, _time, _md.UpperLimitPrice, _md.LowerLimitPrice);
 
-                    //发送
-                    OnTick(_tick);
+                //发送
+                OnTick(_tick);
             };
             mQuoter.OnRtnError += (object sender, ErrorEventArgs e) =>
             {
@@ -101,10 +108,12 @@ namespace QuantEngine
         public void SubscribeMarketData(string instrumentID)
         {
             //已经订阅了，就不订了
-            bool b = false;
-            mSubscribeMap.TryGetValue(instrumentID, out b);
-            if (b)
+            if (mSubscribeMap.ContainsKey(instrumentID)
+                && mSubscribeMap[instrumentID] == true)
+            {
                 return;
+            }
+
 
             //判断登陆状态
             if (IsLogin())

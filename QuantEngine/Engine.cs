@@ -36,8 +36,8 @@ namespace QuantEngine
 
         public void Run()
         {
-            Account mda = new Account("tcp://218.202.237.33:10012", "9999", "044271", "122712");
-            mCtpMd.Login(mda);
+            Account ac = Utils.Config.MyAccount;
+            mCtpMd.Login(ac);
             mCtpMd.OnTick += new RtnTick(_RtnTick);
             foreach(string instrumentID in mStgManager.GetInstrumentIDs())
             {
@@ -47,7 +47,7 @@ namespace QuantEngine
 
         private void _RtnTick(Tick tick)
         {
-            if (!tickFilter.Filter(tick))
+            if (!tickFilter.Check(tick))
                 return;
             mStgManager.SendTick(tick);
         }

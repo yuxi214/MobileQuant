@@ -8,13 +8,13 @@ namespace QuantEngine
 {
     public interface ITickFilter
     {
-        bool Filter(Tick Tick);
+        bool Check(Tick Tick);
     }
 
     internal class DefaultTickFilter : ITickFilter
     {
         private Tick lastTick;
-        public bool Filter(Tick tick)
+        public bool Check(Tick tick)
         {
             //异常值
             if (tick.AskPrice <= 0

@@ -6,8 +6,15 @@ using System.Threading.Tasks;
 
 namespace QuantEngine
 {
+    public delegate void OrderDone(Order order);
+    public delegate void OrderError(Order order);
+    public delegate void OrderTrade(long vol,Order order);
+    public delegate void OrderCancelFailed(Order order);
+    public delegate void OrderCanceled(Order order);
     public class Order
     {
+        //策略
+        private Strategy strategy;
         //合约
         private string instrumentID = string.Empty;
         //买卖
@@ -15,15 +22,34 @@ namespace QuantEngine
         //报价
         private double price = 0d;
         //报单时间(本地时间)
-        private DateTime insertTime = DateTime.Now;
+        private DateTime orderTime = DateTime.Now;
         //报单数量
-        private int volume = 0;
+        private long volume = 0;
         //未成交
-        private int volumeLeft = 0;
+        private long volumeLeft = 0;
         //状态
         private OrderStatus status = OrderStatus.Normal;
         //子订单
-        private List<SubOrder> subOrders = new List<SubOrder>();
+        private List<SubOrder> subOrders;
+
+        //事件
+        public event OrderDone OnDone;
+        public event OrderError OnError;
+        public event OrderTrade OnTraded;
+        public event OrderCanceled OnCanceled;
+        public event OrderCancelFailed OnCancelFailed;
+
+        public Order(Strategy strategy, string instrumentID, DirectionType direction, double price, DateTime orderTime, long volume, long volumeLeft, OrderStatus status)
+        {
+            this.strategy = strategy;
+            this.instrumentID = instrumentID;
+            this.direction = direction;
+            this.price = price;
+            this.orderTime = orderTime;
+            this.volume = volume;
+            this.volumeLeft = volumeLeft;
+            this.status = status;
+        }
 
         public string InstrumentID
         {
@@ -49,7 +75,7 @@ namespace QuantEngine
             }
         }
 
-        public int Volume
+        public long Volume
         {
             get
             {
@@ -57,16 +83,11 @@ namespace QuantEngine
             }
         }
 
-        public int VolumeLeft
+        public long VolumeLeft
         {
             get
             {
                 return volumeLeft;
-            }
-
-            set
-            {
-                volumeLeft = value;
             }
         }
 
@@ -76,24 +97,60 @@ namespace QuantEngine
             {
                 return status;
             }
-
-            set
-            {
-                status = value;
-            }
         }
 
-        public DateTime InsertTime
+        public DateTime OrderTime
         {
             get
             {
-                return insertTime;
+                return orderTime;
             }
+        }
 
+        public Strategy Strategy
+        {
+            get
+            {
+                return strategy;
+            }
+        }
+
+        internal List<SubOrder> SubOrders
+        {
             set
             {
-                insertTime = value;
+                if (subOrders != null)
+                    return;
+
+                subOrders = value;
+                if (subOrders == null)
+                    return;
+                foreach(SubOrder sOrder in subOrders)
+                {
+                    sOrder.OnError += (SubOrder order) =>
+                    {
+
+                    };
+                    sOrder.OnTraded += (long vol,SubOrder order) => 
+                    {
+                        this.volumeLeft -= vol;
+                    };
+                    sOrder.OnCanceled += (SubOrder order) =>
+                    {
+
+                    };
+                    sOrder.OnCancelFailed += (SubOrder order) =>
+                    {
+
+                    };
+                }
             }
+        }
+        private void Refresh()
+        {
+            if (subOrders != null)
+                return;
+
         }
 
         public override string ToString()
@@ -102,8 +159,15 @@ namespace QuantEngine
         }
     }
 
+    internal delegate void SubOrderError(SubOrder sOrder);
+    internal delegate void SubOrderTrade(long vol, SubOrder sOrder);
+    internal delegate void SubOrderCancelFailed(SubOrder sOrder);
+    internal delegate void SubOrderCanceled(SubOrder sOrder);
     public class SubOrder
     {
+        //合并订单
+        private Order pOrder;
+
 		// 报单标识
         private string orderID = string.Empty;
 
@@ -130,6 +194,12 @@ namespace QuantEngine
 
         // 状态
         private OrderStatus status;
+
+        //事件
+        internal event SubOrderError OnError;
+        internal event SubOrderTrade OnTraded;
+        internal event SubOrderCanceled OnCanceled;
+        internal event SubOrderCancelFailed OnCancelFailed;
 
         public string OrderID
         {
@@ -202,11 +272,6 @@ namespace QuantEngine
             {
                 return volume;
             }
-
-            set
-            {
-                volume = value;
-            }
         }
 
         public int VolumeLeft
@@ -214,11 +279,6 @@ namespace QuantEngine
             get
             {
                 return volumeLeft;
-            }
-
-            set
-            {
-                volumeLeft = value;
             }
         }
 
@@ -232,6 +292,14 @@ namespace QuantEngine
             set
             {
                 status = value;
+            }
+        }
+
+        public Order POrder
+        {
+            get
+            {
+                return pOrder;
             }
         }
     }

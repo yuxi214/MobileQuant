@@ -34,7 +34,7 @@ namespace MobileQuant
             }
             catch(Exception ex)
             {
-                Utils.Log(ex.StackTrace);
+                Utils.Log(ex.ToString());
             }
         }
     }

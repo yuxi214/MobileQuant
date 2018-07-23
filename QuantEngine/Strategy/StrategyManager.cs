@@ -38,7 +38,10 @@ namespace QuantEngine
             foreach(string instID in instIDs)
             {
                 HashSet<Strategy> strategySet;
-                mInstIDStrategyMap.TryGetValue(instID, out strategySet);
+                if(!mInstIDStrategyMap.TryGetValue(instID, out strategySet))
+                {
+                    strategySet = new HashSet<Strategy>();
+                }
                 strategySet.Add(strategy);
                 mInstIDStrategyMap[instID] = strategySet;
             }
@@ -51,7 +54,7 @@ namespace QuantEngine
             Type[] types = assembly.GetTypes();
             foreach(Type t in types)
             {
-                if (!t.IsInstanceOfType(typeof(Strategy)))
+                if (!t.IsSubclassOf(typeof(Strategy)))
                     continue;
 
                 Strategy stg = Activator.CreateInstance(t) as Strategy;
@@ -75,12 +78,12 @@ namespace QuantEngine
         internal void SendTick(Tick tick)
         {
             HashSet<Strategy> strategySet;
-            mInstIDStrategyMap.TryGetValue(tick.InstrumentID,out strategySet);
-            if (strategySet == null)
-                return;
-            foreach(Strategy stg in strategySet)
+            if (mInstIDStrategyMap.TryGetValue(tick.InstrumentID, out strategySet))
             {
-                stg.SendTick(tick);
+                foreach (Strategy stg in strategySet)
+                {
+                    stg.SendTick(tick);
+                }
             }
         }
         #endregion
