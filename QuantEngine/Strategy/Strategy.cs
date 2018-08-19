@@ -53,6 +53,7 @@ namespace QuantEngine
     }
 
     //交易
+    internal delegate void OnOrderSend(Order order);
     public partial class Strategy
     {
         //持仓
@@ -69,11 +70,14 @@ namespace QuantEngine
         private List<Order> orderList = new List<Order>();
         private List<Order> activeOrderList = new List<Order>();
         private List<Order> doneOrderList = new List<Order>();
+        //订单发送事件
+        internal event OnOrderSend OnOrderSend;
         //发送订单
         internal void SendOrder(Order order)
         {
             orderList.Add(order);
             activeOrderList.Add(order);
+            OnOrderSend(order);
         }
         //更新订单
         internal void UpdateOrder(Order order)

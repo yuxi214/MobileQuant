@@ -9,28 +9,14 @@ namespace QuantEngine
     public interface ITdProvider
     {
         //登陆
-        bool Login();
+        void Login(Account account);
         //登出
-        bool Logout();
+        void Logout();
         //是否登陆
         bool IsLogin();
         //发送订单
-        bool SendOrder(SubOrder subOrder);
+        void SendOrder(SubOrder subOrder);
         //撤销订单
-        bool CancelOrder(SubOrder subOrder);
-        //成交回报
-        event RtnTrade OnTrade;
-        //订单回报
-        event RtnOrder OnOrder;
-        //发单失败
-        event RtnOrderFaild OnOrderFaild;
-        //撤单失败
-        event RtnCancelFaild OnCancelFaild;
+        void CancelOrder(SubOrder subOrder);
     }
-
-    //委托
-    public delegate void RtnOrder(Order order);
-    public delegate void RtnOrderFaild(Order order);
-    public delegate void RtnCancelFaild(Order order);
-    public delegate void RtnTrade(Trade trade);
 }

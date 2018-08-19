@@ -24,6 +24,9 @@ namespace QuantEngine
             loadStrategy();
         }
 
+        //订单分发
+        internal event OnOrderSend OnOrderSend;
+
         //策略添加
         private Dictionary<string, Strategy> mStrategyMap = new Dictionary<string, Strategy>();
         internal void addStrategy(string name, Strategy strategy)
@@ -31,6 +34,12 @@ namespace QuantEngine
             //策略去重
             if (mStrategyMap.ContainsKey(name))
                 return;
+
+            //订单分发
+            strategy.OnOrderSend += (Order order) =>
+            {
+                OnOrderSend(order);
+            };
 
             //行情映射
             mStrategyMap.Add(name, strategy);

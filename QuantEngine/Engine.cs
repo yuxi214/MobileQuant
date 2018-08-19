@@ -8,7 +8,7 @@ namespace QuantEngine
 {
     public class Engine
     {
-        private CtpMdProvider mCtpMd = CtpMdProvider.Instance;
+        private CtpMdProvider mMp = CtpMdProvider.Instance;
         private StrategyManager mStgManager = StrategyManager.Instance;
         private ITickFilter tickFilter = new DefaultTickFilter();
 
@@ -32,16 +32,28 @@ namespace QuantEngine
             }
         }
 
-        private Engine() { }
+        private Engine() {
+            init();
+        }
 
+        private void init()
+        {
+            //连接订单分发事件
+            mStgManager.OnOrderSend += (Order order) =>
+            {
+                _SendOrder(order);
+            };
+        }
+
+        //启动引擎
         public void Run()
         {
             Account ac = Utils.Config.MyAccount;
-            mCtpMd.Login(ac);
-            mCtpMd.OnTick += new RtnTick(_RtnTick);
+            mMp.Login(ac);
+            mMp.OnTick += new RtnTick(_RtnTick);
             foreach(string instrumentID in mStgManager.GetInstrumentIDs())
             {
-                mCtpMd.SubscribeMarketData(instrumentID);
+                mMp.SubscribeMarketData(instrumentID);
             }
         }
 
@@ -50,6 +62,11 @@ namespace QuantEngine
             if (!tickFilter.Check(tick))
                 return;
             mStgManager.SendTick(tick);
+        }
+
+        private void _SendOrder(Order order)
+        {
+
         }
 
     }

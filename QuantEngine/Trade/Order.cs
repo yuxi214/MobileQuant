@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace QuantEngine
 {
+    //订单委托
     public delegate void OrderDone(Order order);
     public delegate void OrderError(Order order);
     public delegate void OrderTrade(long vol,Order order);
@@ -157,8 +158,15 @@ namespace QuantEngine
         {
             return $"{instrumentID},{direction},{price},{volume},{volumeLeft},{Status}";
         }
+
+        //发送订单
+        public void Send()
+        {
+            strategy.SendOrder(this);
+        }
     }
 
+    //子订单委托
     internal delegate void SubOrderError(SubOrder sOrder);
     internal delegate void SubOrderTrade(long vol, SubOrder sOrder);
     internal delegate void SubOrderCancelFailed(SubOrder sOrder);

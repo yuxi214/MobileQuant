@@ -52,6 +52,7 @@
     <Compile Include="Data\Config.cs" />
     <Compile Include="Data\DataManager.cs" />
     <Compile Include="MarketData\CtpMdProvider.cs" />
+    <Compile Include="Trade\CtpTdProvider.cs" />
     <Compile Include="MarketData\IMdProvider.cs" />
     <Compile Include="Trade\ITdProvider.cs" />
     <Compile Include="Message\MessageManager.cs" />
