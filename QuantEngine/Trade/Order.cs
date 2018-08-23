@@ -168,13 +168,16 @@ namespace QuantEngine
 
     //子订单委托
     internal delegate void SubOrderError(SubOrder sOrder);
-    internal delegate void SubOrderTrade(long vol, SubOrder sOrder);
+    internal delegate void SubOrderTrade(long vol,SubOrder sOrder);
     internal delegate void SubOrderCancelFailed(SubOrder sOrder);
     internal delegate void SubOrderCanceled(SubOrder sOrder);
-    public class SubOrder
+    internal class SubOrder
     {
         //合并订单
         private Order pOrder;
+
+        //用户标识
+        private int customID = 0;
 
 		// 报单标识
         private string orderID = string.Empty;
@@ -208,6 +211,23 @@ namespace QuantEngine
         internal event SubOrderTrade OnTraded;
         internal event SubOrderCanceled OnCanceled;
         internal event SubOrderCancelFailed OnCancelFailed;
+
+        internal void EmitTrade(long vol)
+        {
+            OnTraded(vol,this);
+        }
+        internal void EmitError()
+        {
+            OnError(this);
+        }
+        internal void EmitCancel()
+        {
+            OnCanceled(this);
+        }
+        internal void EmitCancelFailed()
+        {
+            OnCancelFailed(this);
+        }
 
         public string OrderID
         {
@@ -288,6 +308,10 @@ namespace QuantEngine
             {
                 return volumeLeft;
             }
+            set
+            {
+                VolumeLeft = value;
+            }
         }
 
         public OrderStatus Status
@@ -308,6 +332,19 @@ namespace QuantEngine
             get
             {
                 return pOrder;
+            }
+        }
+
+        public int CustomID
+        {
+            get
+            {
+                return customID;
+            }
+
+            set
+            {
+                customID = value;
             }
         }
     }
