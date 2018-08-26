@@ -15,8 +15,8 @@ namespace QuantEngine
         //是否登陆
         bool IsLogin();
         //发送订单
-        void SendOrder(SubOrder subOrder);
+        void SendOrder(Order order);
         //撤销订单
-        void CancelOrder(SubOrder subOrder);
+        void CancelOrder(Order order);
     }
 }

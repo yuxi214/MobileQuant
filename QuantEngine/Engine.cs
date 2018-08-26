@@ -8,7 +8,8 @@ namespace QuantEngine
 {
     public class Engine
     {
-        private CtpMdProvider mMp = CtpMdProvider.Instance;
+        private IMdProvider mMp = CtpMdProvider.Instance;
+        private ITdProvider mTp = CtpTdProvider.Instance;
         private StrategyManager mStgManager = StrategyManager.Instance;
         private ITickFilter tickFilter = new DefaultTickFilter();
 
@@ -48,13 +49,20 @@ namespace QuantEngine
         //启动引擎
         public void Run()
         {
+            //账号
             Account ac = Utils.Config.MyAccount;
+
+            //启动行情接口
             mMp.Login(ac);
             mMp.OnTick += new RtnTick(_RtnTick);
             foreach(string instrumentID in mStgManager.GetInstrumentIDs())
             {
                 mMp.SubscribeMarketData(instrumentID);
             }
+
+            //启动交易接口
+            mTp.Login(ac);
+            mTp.
         }
 
         private void _RtnTick(Tick tick)
