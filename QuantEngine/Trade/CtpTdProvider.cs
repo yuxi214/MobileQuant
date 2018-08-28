@@ -8,15 +8,6 @@ using HaiFeng;
 
 namespace QuantEngine
 {
-    internal class Frozen
-    {
-        internal string InstrumentID;
-        internal int FrozenLong;
-        internal int FrozenTdLong;
-        internal int FrozenShort;
-        internal int FrozenTdShort;
-    }
-
     internal class CtpTdProvider : ITdProvider
     {
         private Account mAccount;
@@ -24,7 +15,7 @@ namespace QuantEngine
 
         private int customID = 1; //自增编码，用来定位订单回报
         Dictionary<int, SubOrder> orderMap = new Dictionary<int, SubOrder>(); //订单
-        Dictionary<string, Frozen> frozenMap = new Dictionary<string, Frozen>(); //冻结
+        List<SubOrder> activeOrders = new List<SubOrder>(); //活跃订单
 
         private static CtpTdProvider instance = new CtpTdProvider();
 
@@ -101,13 +92,20 @@ namespace QuantEngine
             PositionField position;
             if (mTrader.DicPositionField.TryGetValue(order.InstrumentID + "_" + (order.Direction == DirectionType.Buy ? "Sell" : "Buy"), out position))
             {
-                Frozen frozen = new Frozen();
-                if (frozenMap.ContainsKey(order.InstrumentID))
+                //计算冻结数量
+                int frozenTd = 0;
+                int frozenYd = 0;
+
+                foreach (SubOrder subOrder in activeOrders)
                 {
-                    frozen = frozenMap[order.InstrumentID];
+                    if (order.Direction == subOrder.Direction)
+                    {
+                        frozenTd += subOrder.Offset == OffsetType.CloseToday ? subOrder.VolumeLeft : 0;
+                        frozenYd += subOrder.Offset == OffsetType.Close ? subOrder.VolumeLeft : 0;
+                    }
                 }
 
-                //剩余订单
+                //剩余数量
                 int volLeft = order.Volume;
 
                 //先平今
@@ -115,8 +113,8 @@ namespace QuantEngine
                 {
                     return;
                 }
-                int posLeft = order.Direction == DirectionType.Buy ? position.TdPosition - frozen.FrozenTdShort:position.TdPosition - frozen.FrozenTdLong;
-                int vol = posLeft> volLeft ? volLeft : volLeft - posLeft;
+                int posLeft = position.TdPosition - frozenTd;
+                int vol = posLeft > volLeft ? volLeft : volLeft - posLeft;
                 volLeft -= vol;
                 if (vol > 0)
                 {
@@ -138,7 +136,7 @@ namespace QuantEngine
                 {
                     return;
                 }
-                posLeft = order.Direction == DirectionType.Buy ? position.Position - frozen.FrozenShort : position.Position - frozen.FrozenLong;
+                posLeft = position.YdPosition - frozenYd;
                 vol = posLeft > volLeft ? volLeft : volLeft - posLeft;
                 volLeft -= vol;
                 if (vol > 0)
@@ -215,6 +213,7 @@ namespace QuantEngine
             //自增编码
             subOrder.CustomID = customID++;
             orderMap.Add(subOrder.CustomID, subOrder);
+            activeOrders.Add(subOrder);
 
             //转换
             HaiFeng.DirectionType direction = subOrder.Direction == DirectionType.Buy ? HaiFeng.DirectionType.Buy : HaiFeng.DirectionType.Sell;
@@ -226,59 +225,9 @@ namespace QuantEngine
                     break;
                 case OffsetType.Close:
                     offset = HaiFeng.OffsetType.Close;
-                    //记录冻结
-                    if (frozenMap.ContainsKey(subOrder.InstrumentID))
-                    {
-                        if(direction == HaiFeng.DirectionType.Buy)
-                        {
-                            frozenMap[subOrder.InstrumentID].FrozenShort += subOrder.Volume;
-                        }
-                        else
-                        {
-                            frozenMap[subOrder.InstrumentID].FrozenLong += subOrder.Volume;
-                        }
-                    }
-                    else
-                    {
-                        Frozen frozen = new Frozen();
-                        if (direction == HaiFeng.DirectionType.Buy)
-                        {
-                            frozen.FrozenShort += subOrder.Volume;
-                        }
-                        else
-                        {
-                            frozen.FrozenLong += subOrder.Volume;
-                        }
-                        frozenMap.Add(subOrder.InstrumentID, frozen);
-                    }
                     break;
                 case OffsetType.CloseToday:
                     offset = HaiFeng.OffsetType.CloseToday;
-                    //记录冻结
-                    if (frozenMap.ContainsKey(subOrder.InstrumentID))
-                    {
-                        if (direction == HaiFeng.DirectionType.Buy)
-                        {
-                            frozenMap[subOrder.InstrumentID].FrozenTdShort += subOrder.Volume;
-                        }
-                        else
-                        {
-                            frozenMap[subOrder.InstrumentID].FrozenTdLong += subOrder.Volume;
-                        }
-                    }
-                    else
-                    {
-                        Frozen frozen = new Frozen();
-                        if (direction == HaiFeng.DirectionType.Buy)
-                        {
-                            frozen.FrozenTdShort += subOrder.Volume;
-                        }
-                        else
-                        {
-                            frozen.FrozenTdLong += subOrder.Volume;
-                        }
-                        frozenMap.Add(subOrder.InstrumentID, frozen);
-                    }
                     break;
             }
 
@@ -353,10 +302,12 @@ namespace QuantEngine
                 case HaiFeng.OrderStatus.Canceled:
                     cancle = subOrder.Status == OrderStatus.Canceled ? false : true;
                     subOrder.Status = OrderStatus.Canceled;
+                    activeOrders.Remove(subOrder);
                     break;
                 case HaiFeng.OrderStatus.Filled:
                     filled = subOrder.Status == OrderStatus.Filled ? false : true;
                     subOrder.Status = OrderStatus.Filled;
+                    activeOrders.Remove(subOrder);
                     break;
                 case HaiFeng.OrderStatus.Normal:
                     subOrder.Status = OrderStatus.Normal;
@@ -369,9 +320,6 @@ namespace QuantEngine
             //发送事件
             if (tradeVol > 0)
             {
-                //更新冻结
-                fadfaf
-
                 subOrder.EmitTrade(tradeVol);
             }
             if (cancle)
@@ -392,6 +340,7 @@ namespace QuantEngine
                 Utils.Log($"报单错误回报|未找到对应本地单：{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}");
                 return;
             }
+            activeOrders.Remove(subOrder);
             subOrder.EmitError();
             Utils.Log($"报单错误回报：{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}");
 

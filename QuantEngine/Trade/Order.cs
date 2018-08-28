@@ -15,7 +15,7 @@ namespace QuantEngine
     public class Order
     {
         //策略
-        private Strategy strategy;
+        private BaseStrategy strategy;
         //合约
         private string instrumentID = string.Empty;
         //买卖
@@ -40,7 +40,7 @@ namespace QuantEngine
         public event OrderCanceled OnCanceled;
         public event OrderCancelFailed OnCancelFailed;
 
-        public Order(Strategy strategy, string instrumentID, DirectionType direction, double price, DateTime orderTime, int volume, int volumeLeft, OrderStatus status)
+        public Order(BaseStrategy strategy, string instrumentID, DirectionType direction, double price, DateTime orderTime, int volume, int volumeLeft, OrderStatus status)
         {
             this.strategy = strategy;
             this.instrumentID = instrumentID;
@@ -108,7 +108,7 @@ namespace QuantEngine
             }
         }
 
-        public Strategy Strategy
+        public BaseStrategy Strategy
         {
             get
             {
@@ -130,7 +130,7 @@ namespace QuantEngine
                 {
                     sOrder.OnError += (SubOrder order) =>
                     {
-
+                        该怎么处理呢
                     };
                     sOrder.OnTraded += (int vol,SubOrder order) => 
                     {
@@ -138,11 +138,11 @@ namespace QuantEngine
                     };
                     sOrder.OnCanceled += (SubOrder order) =>
                     {
-
+                        该怎么处理呢
                     };
                     sOrder.OnCancelFailed += (SubOrder order) =>
                     {
-
+                        该怎么处理呢
                     };
                 }
             }

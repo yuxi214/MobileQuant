@@ -62,7 +62,6 @@ namespace QuantEngine
 
             //启动交易接口
             mTp.Login(ac);
-            mTp.
         }
 
         private void _RtnTick(Tick tick)
@@ -74,7 +73,10 @@ namespace QuantEngine
 
         private void _SendOrder(Order order)
         {
-
+            if (mTp.IsLogin())
+            {
+                mTp.SendOrder(order);
+            }
         }
 
     }

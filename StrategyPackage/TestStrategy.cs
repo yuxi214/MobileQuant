@@ -8,7 +8,7 @@ using QuantEngine;
 
 namespace StrategyPackage
 {
-    public class TestStrategy:Strategy
+    public class TestStrategy:BaseStrategy
     {
         public override string[] OnLoadInstrument()
         {

@@ -28,8 +28,8 @@ namespace QuantEngine
         internal event OnOrderSend OnOrderSend;
 
         //策略添加
-        private Dictionary<string, Strategy> mStrategyMap = new Dictionary<string, Strategy>();
-        internal void addStrategy(string name, Strategy strategy)
+        private Dictionary<string, BaseStrategy> mStrategyMap = new Dictionary<string, BaseStrategy>();
+        internal void addStrategy(string name, BaseStrategy strategy)
         {
             //策略去重
             if (mStrategyMap.ContainsKey(name))
@@ -46,10 +46,10 @@ namespace QuantEngine
             string[] instIDs = strategy.OnLoadInstrument();
             foreach(string instID in instIDs)
             {
-                HashSet<Strategy> strategySet;
+                HashSet<BaseStrategy> strategySet;
                 if(!mInstIDStrategyMap.TryGetValue(instID, out strategySet))
                 {
-                    strategySet = new HashSet<Strategy>();
+                    strategySet = new HashSet<BaseStrategy>();
                 }
                 strategySet.Add(strategy);
                 mInstIDStrategyMap[instID] = strategySet;
@@ -63,10 +63,10 @@ namespace QuantEngine
             Type[] types = assembly.GetTypes();
             foreach(Type t in types)
             {
-                if (!t.IsSubclassOf(typeof(Strategy)))
+                if (!t.IsSubclassOf(typeof(BaseStrategy)))
                     continue;
 
-                Strategy stg = Activator.CreateInstance(t) as Strategy;
+                BaseStrategy stg = Activator.CreateInstance(t) as BaseStrategy;
                 if (stg == null)
                     continue;
 
@@ -83,13 +83,13 @@ namespace QuantEngine
         
 
         //行情分发
-        private Dictionary<string, HashSet<Strategy>> mInstIDStrategyMap = new Dictionary<string, HashSet<Strategy>>();
+        private Dictionary<string, HashSet<BaseStrategy>> mInstIDStrategyMap = new Dictionary<string, HashSet<BaseStrategy>>();
         internal void SendTick(Tick tick)
         {
-            HashSet<Strategy> strategySet;
+            HashSet<BaseStrategy> strategySet;
             if (mInstIDStrategyMap.TryGetValue(tick.InstrumentID, out strategySet))
             {
-                foreach (Strategy stg in strategySet)
+                foreach (BaseStrategy stg in strategySet)
                 {
                     stg.SendTick(tick);
                 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace QuantEngine
 {
     //用户实现
-    public partial class Strategy
+    public partial class BaseStrategy
     {
         public virtual void OnStart() { }
         public virtual void OnStop() { }
@@ -17,7 +17,7 @@ namespace QuantEngine
     }
 
     //行情
-    public partial class Strategy
+    public partial class BaseStrategy
     {
         //合约列表
         private string mMainInstID = string.Empty;
@@ -54,7 +54,7 @@ namespace QuantEngine
 
     //交易
     internal delegate void OnOrderSend(Order order);
-    public partial class Strategy
+    public partial class BaseStrategy
     {
         //持仓
         private int mPosition = 0;
@@ -92,7 +92,7 @@ namespace QuantEngine
         }
 
         //订单生成函数
-        public Order BuyOrder(long vol)
+        public Order BuyOrder(int vol)
         {
             if (lastTickMap.ContainsKey(mMainInstID))
             {
@@ -106,16 +106,16 @@ namespace QuantEngine
             }
 
         }
-        public Order BuyOrder(long vol, double price)
+        public Order BuyOrder(int vol, double price)
         {
             return BuyOrder(vol, price, mMainInstID);
         }
-        public Order BuyOrder(long vol, double price, string instrumentID)
+        public Order BuyOrder(int vol, double price, string instrumentID)
         {
             Order order = new Order(this, instrumentID, DirectionType.Buy, price, DateTime.Now, vol, vol, OrderStatus.Normal);
             return order;
         }
-        public Order SellOrder(long vol)
+        public Order SellOrder(int vol)
         {
             if (lastTickMap.ContainsKey(mMainInstID))
             {
@@ -129,16 +129,16 @@ namespace QuantEngine
             }
 
         }
-        public Order SellOrder(long vol, double price)
+        public Order SellOrder(int vol, double price)
         {
             return SellOrder(vol, price, mMainInstID);
         }
-        public Order SellOrder(long vol, double price, string instrumentID)
+        public Order SellOrder(int vol, double price, string instrumentID)
         {
             Order order = new Order(this, instrumentID, DirectionType.Sell, price, DateTime.Now, vol, vol, OrderStatus.Normal);
             return order;
         }
-        public Order ToPositionOrder(long position)
+        public Order ToPositionOrder(int position)
         {
             if (position > mPosition && lastTickMap.ContainsKey(mMainInstID))
             {
@@ -153,11 +153,11 @@ namespace QuantEngine
                 return BuyOrder(0);
             }
         }
-        public Order ToPositionOrder(long position, double price)
+        public Order ToPositionOrder(int position, double price)
         {
             return ToPositionOrder(position, price, mMainInstID);
         }
-        public Order ToPositionOrder(long position, double price, string instrumentID)
+        public Order ToPositionOrder(int position, double price, string instrumentID)
         {
             if(position > mPosition)
             {

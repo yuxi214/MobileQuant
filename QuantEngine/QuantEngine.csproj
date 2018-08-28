@@ -59,7 +59,7 @@
     <Compile Include="Trade\Order.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Engine.cs" />
-    <Compile Include="Strategy\Strategy.cs" />
+    <Compile Include="Strategy\BaseStrategy.cs" />
     <Compile Include="Strategy\StrategyManager.cs" />
     <Compile Include="MarketData\Tick.cs" />
     <Compile Include="MarketData\ITickFilter.cs" />
