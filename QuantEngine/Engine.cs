@@ -79,5 +79,10 @@ namespace QuantEngine
             }
         }
 
+        private void _CancleOrder(Order order)
+        {
+            mTp.CancelOrder(order);
+        }
+
     }
 }

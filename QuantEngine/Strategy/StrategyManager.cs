@@ -26,6 +26,8 @@ namespace QuantEngine
 
         //订单分发
         internal event OnOrderSend OnOrderSend;
+        //撤单
+        internal event OnOrderCancle OnOrderCancle;
 
         //策略添加
         private Dictionary<string, BaseStrategy> mStrategyMap = new Dictionary<string, BaseStrategy>();
@@ -39,6 +41,11 @@ namespace QuantEngine
             strategy.OnOrderSend += (Order order) =>
             {
                 OnOrderSend(order);
+            };
+            //撤单
+            strategy.OnOrderCancle += (Order order) =>
+            {
+                OnOrderCancle(order);
             };
 
             //行情映射

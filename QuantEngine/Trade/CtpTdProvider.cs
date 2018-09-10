@@ -295,8 +295,10 @@ namespace QuantEngine
             subOrder.OrderID = order.OrderID;
             bool cancle = false;
             bool filled = false;
-            int tradeVol = subOrder.VolumeLeft - order.VolumeLeft;
+            bool error = false;
+            int tradeVol = order.TradeVolume - subOrder.VolumeTraded;
             subOrder.VolumeLeft = order.VolumeLeft;
+            subOrder.VolumeTraded = order.TradeVolume;
             switch (order.Status)
             {
                 case HaiFeng.OrderStatus.Canceled:
@@ -309,12 +311,18 @@ namespace QuantEngine
                     subOrder.Status = OrderStatus.Filled;
                     activeOrders.Remove(subOrder);
                     break;
+                case HaiFeng.OrderStatus.Error:
+                    error = subOrder.Status == OrderStatus.Error ? false : true;
+                    subOrder.Status = OrderStatus.Error;
+                    activeOrders.Remove(subOrder);
+                    break;
                 case HaiFeng.OrderStatus.Normal:
                     subOrder.Status = OrderStatus.Normal;
                     break;
                 case HaiFeng.OrderStatus.Partial:
                     subOrder.Status = OrderStatus.Partial;
                     break;
+
             }
 
             //发送事件
@@ -326,6 +334,10 @@ namespace QuantEngine
             {
                 subOrder.EmitCancel();
             }
+            if (error)
+            {
+                subOrder.EmitError();
+            }
 
 
             Utils.Log($"订单回报：{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}");
@@ -334,14 +346,6 @@ namespace QuantEngine
         private void _OnRtnErrOrder(object sender, ErrOrderArgs e)
         {
             OrderField order = e.Value;
-            SubOrder subOrder;
-            if (!orderMap.TryGetValue(order.Custom, out subOrder))
-            {
-                Utils.Log($"报单错误回报|未找到对应本地单：{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}");
-                return;
-            }
-            activeOrders.Remove(subOrder);
-            subOrder.EmitError();
             Utils.Log($"报单错误回报：{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}");
 
         }

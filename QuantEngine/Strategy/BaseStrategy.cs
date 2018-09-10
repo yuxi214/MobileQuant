@@ -54,6 +54,8 @@ namespace QuantEngine
 
     //交易
     internal delegate void OnOrderSend(Order order);
+    internal delegate void OnOrderCancle(Order order);
+
     public partial class BaseStrategy
     {
         //持仓
@@ -79,6 +81,13 @@ namespace QuantEngine
             activeOrderList.Add(order);
             OnOrderSend(order);
         }
+        //撤单
+        internal event OnOrderCancle OnOrderCancle;
+        internal void CancleOrder(Order order)
+        {
+            OnOrderCancle(order);
+        }
+
         //更新订单
         internal void UpdateOrder(Order order)
         {
