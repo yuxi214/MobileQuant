@@ -11,18 +11,32 @@ namespace QuantEngine
 {
     internal class Config
     {
-        private Account myAccount;
+        private Account myTdAccount;
+        private Account myMdAccount;
 
-        public Account MyAccount
+        public Account MyTdAccount
         {
             get
             {
-                return myAccount;
+                return myTdAccount;
             }
 
             set
             {
-                myAccount = value;
+                myTdAccount = value;
+            }
+        }
+
+        public Account MyMdAccount
+        {
+            get
+            {
+                return myMdAccount;
+            }
+
+            set
+            {
+                myMdAccount = value;
             }
         }
     }

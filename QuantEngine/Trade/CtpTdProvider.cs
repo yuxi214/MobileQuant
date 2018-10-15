@@ -78,6 +78,14 @@ namespace QuantEngine
         //发送订单
         public void SendOrder(Order order)
         {
+            //未登录，则返回
+            if (!IsLogin())
+            {
+                Utils.Log("ctptd:交易未登录，下单失败");
+                return;
+            }
+
+            //
             createSubOrder(order);
             foreach (SubOrder subOrder in order.SubOrders)
             {

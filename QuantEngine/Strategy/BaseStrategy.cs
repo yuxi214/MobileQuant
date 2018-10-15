@@ -21,7 +21,7 @@ namespace QuantEngine
     {
         //合约列表
         private string mMainInstID = string.Empty;
-        private HashSet<string> mInstIDSet;
+        private HashSet<string> mInstIDSet = new HashSet<string>();
 
         //最新tick
         private Dictionary<string, Tick> lastTickMap = new Dictionary<string, Tick>();
@@ -52,12 +52,18 @@ namespace QuantEngine
         }
     }
 
-    //交易
-    internal delegate void OnOrderSend(Order order);
-    internal delegate void OnOrderCancle(Order order);
-
     public partial class BaseStrategy
     {
+        //交易接口
+        private ITdProvider mTdProvider;
+        internal ITdProvider TdProvider
+        {
+            set
+            {
+                mTdProvider = value;
+            }
+        }
+
         //持仓
         private int mPosition = 0;
         public int Position
@@ -72,20 +78,25 @@ namespace QuantEngine
         private List<Order> orderList = new List<Order>();
         private List<Order> activeOrderList = new List<Order>();
         private List<Order> doneOrderList = new List<Order>();
-        //订单发送事件
-        internal event OnOrderSend OnOrderSend;
+
         //发送订单
         internal void SendOrder(Order order)
         {
             orderList.Add(order);
             activeOrderList.Add(order);
-            OnOrderSend(order);
+            if (mTdProvider != null)
+            {
+                mTdProvider.SendOrder(order);
+            }
         }
+
         //撤单
-        internal event OnOrderCancle OnOrderCancle;
         internal void CancleOrder(Order order)
         {
-            OnOrderCancle(order);
+            if (mTdProvider != null)
+            {
+                mTdProvider.CancelOrder(order);
+            }
         }
 
         //更新订单

@@ -41,7 +41,9 @@ namespace QuantEngine
                 if (File.Exists(path))
                 {
                     StreamWriter sw = new StreamWriter(path, true, System.Text.Encoding.Default);
-                    sw.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + type + "-->" + content);
+                    string c = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + type + "-->" + content;
+                    Console.WriteLine(c);
+                    sw.WriteLine(c);
                     //  sw.WriteLine("----------------------------------------");
                     sw.Close();
                 }
@@ -63,9 +65,10 @@ namespace QuantEngine
                 else
                 {
                     config = new Config();
-                    config.MyAccount = new Account("tcp://218.202.237.33:10012", "9999", "123456", "123456");
+                    config.MyTdAccount = new Account("tcp://218.202.237.33:10000", "9999", "123456", "123456");
+                    config.MyMdAccount = new Account("tcp://218.202.237.33:10001", "9999", "123456", "123456");
                     File.Create(path).Close();
-                    File.WriteAllText(path, JsonConvert.SerializeObject(config));
+                    File.WriteAllText(path, JsonConvert.SerializeObject(config, Newtonsoft.Json.Formatting.Indented));
                 }
                 return config;
             }

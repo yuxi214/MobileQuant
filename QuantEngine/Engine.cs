@@ -33,27 +33,17 @@ namespace QuantEngine
             }
         }
 
-        private Engine() {
-            init();
-        }
-
-        private void init()
-        {
-            //连接订单分发事件
-            mStgManager.OnOrderSend += (Order order) =>
-            {
-                _SendOrder(order);
-            };
-        }
+        private Engine() {}
 
         //启动引擎
         public void Run()
         {
             //账号
-            Account ac = Utils.Config.MyAccount;
+            Account mac = Utils.Config.MyMdAccount;
+            Account tac = Utils.Config.MyTdAccount;
 
             //启动行情接口
-            mMp.Login(ac);
+            mMp.Login(mac);
             mMp.OnTick += new RtnTick(_RtnTick);
             foreach(string instrumentID in mStgManager.GetInstrumentIDs())
             {
@@ -61,7 +51,8 @@ namespace QuantEngine
             }
 
             //启动交易接口
-            mTp.Login(ac);
+            mTp.Login(tac);
+            mStgManager.TdProvider = mTp;
         }
 
         private void _RtnTick(Tick tick)

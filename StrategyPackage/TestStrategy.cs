@@ -14,9 +14,15 @@ namespace StrategyPackage
         {
             return new string[] { "ru1901", "TA901", "y1901" };
         }
+        long count = 0;
         public override void OnTick(Tick tick)
         {
-            Console.WriteLine($"{tick.InstrumentID}:{tick.LastPrice}");
+            Console.WriteLine($"{DateTime.Now}-->{tick.InstrumentID}:{tick.LastPrice}");
+            if(count++%100 == 0)
+            {
+                Order order = BuyOrder(1);
+                order.Send();
+            }
         }
     }
 }

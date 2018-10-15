@@ -24,10 +24,20 @@ namespace QuantEngine
             loadStrategy();
         }
 
-        //订单分发
-        internal event OnOrderSend OnOrderSend;
-        //撤单
-        internal event OnOrderCancle OnOrderCancle;
+        //交易接口
+        private ITdProvider mTdProvider;
+        internal ITdProvider TdProvider
+        {
+            set
+            {
+                mTdProvider = value;
+                //设置策略的交易接口
+                foreach(BaseStrategy stg in mStrategyMap.Values)
+                {
+                    stg.TdProvider = mTdProvider;
+                }
+            }
+        }
 
         //策略添加
         private Dictionary<string, BaseStrategy> mStrategyMap = new Dictionary<string, BaseStrategy>();
@@ -38,15 +48,10 @@ namespace QuantEngine
                 return;
 
             //订单分发
-            strategy.OnOrderSend += (Order order) =>
+            if(mTdProvider != null)
             {
-                OnOrderSend(order);
-            };
-            //撤单
-            strategy.OnOrderCancle += (Order order) =>
-            {
-                OnOrderCancle(order);
-            };
+                strategy.TdProvider = mTdProvider;
+            }
 
             //行情映射
             mStrategyMap.Add(name, strategy);
@@ -62,6 +67,8 @@ namespace QuantEngine
                 mInstIDStrategyMap[instID] = strategySet;
             }
 
+            //启动策略
+            strategy.SendStart();
         }
 
         private void loadStrategy()

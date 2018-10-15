@@ -7,11 +7,6 @@ using System.Threading.Tasks;
 namespace QuantEngine
 {
     //订单委托
-    public delegate void OrderCopleted(Order order);
-    public delegate void OrderError(Order order);
-    public delegate void OrderTrade(int vol, Order order);
-    public delegate void OrderCancelFailed(Order order);
-    public delegate void OrderCanceled(Order order);
     public delegate void OrderChanged(Order order);
     public class Order
     {
@@ -37,10 +32,6 @@ namespace QuantEngine
         private List<SubOrder> subOrders;
 
         //事件
-        public event OrderCopleted OnCompleted;
-        public event OrderError OnError;
-        public event OrderTrade OnTraded;
-        public event OrderCanceled OnCanceled;
         public event OrderChanged OnChanged;
 
         public Order(BaseStrategy strategy, string instrumentID, DirectionType direction, double price, DateTime orderTime, int volume, int volumeLeft, OrderStatus status)
@@ -134,23 +125,18 @@ namespace QuantEngine
                     sOrder.OnError += (SubOrder order) =>
                     {
                         refresh();
-                        OnChanged(this);
                     };
                     sOrder.OnTraded += (int vol, SubOrder order) =>
                     {
-                        volumeTraded += vol;
-                        volumeLeft -= vol;
-                        OnTraded(vol, this);
                         refresh();
                     };
                     sOrder.OnCanceled += (SubOrder order) =>
                     {
                         refresh();
-                        OnChanged(this);
                     };
                     sOrder.OnCancelFailed += (SubOrder order) =>
                     {
-                        怎么处理撤单失败呢
+                        refresh();
                     };
                 }
             }
@@ -169,6 +155,9 @@ namespace QuantEngine
             int left = 0;
             int traded = 0;
 
+            bool normal = true;
+            bool partial = true;
+            bool filled = true;
             bool error = true;
             bool cancled = true;
 
@@ -178,27 +167,37 @@ namespace QuantEngine
                 left += sOrder.VolumeLeft;
                 traded += sOrder.VolumeTraded;
 
-                error = sOrder.Status != OrderStatus.Error ? false : true;
-                cancled = sOrder.Status != OrderStatus.Canceled ? false : true;
+                normal = normal && sOrder.Status == OrderStatus.Normal;
+                filled = filled && sOrder.Status == OrderStatus.Filled;
+                error = error && sOrder.Status == OrderStatus.Filled;
+                cancled = cancled && sOrder.Status == OrderStatus.Canceled;
             }
 
-            //错误
-            if (error)
+            volumeLeft = left;
+            volumeTraded = traded;
+
+            //状态
+            if (normal)
             {
-                OnError(this);
+                status = OrderStatus.Normal;
+            }else if (filled)
+            {
+                status = OrderStatus.Filled;
+            }else if (error)
+            {
+                status = OrderStatus.Error;
+            }else if (cancled)
+            {
+                status = OrderStatus.Canceled;
+            }
+            else
+            {
+                status = OrderStatus.Partial;
             }
 
-            //撤单
-            if (cancled)
-            {
-                OnCanceled(this);
-            }
-
-            //订单完成
-            if(volumeLeft == 0)
-            {
-                OnCompleted(this);
-            }
+            //订单状态变化
+            strategy.UpdateOrder(this);
+            OnChanged(this);
         }
 
         public override string ToString()
