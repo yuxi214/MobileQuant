@@ -12,12 +12,13 @@ namespace QuantEngine
     public class Utils
     {
 
+
         //日志
         public static void Log(string content)
         {
             WriteLogs("Logs", "", content);
         }
-        public static void WriteLogs(string fileName, string type, string content)
+        private static void WriteLogs(string fileName, string type, string content)
         {
             string path = AppDomain.CurrentDomain.BaseDirectory;
             if (!string.IsNullOrEmpty(path))
@@ -40,12 +41,18 @@ namespace QuantEngine
                 }
                 if (File.Exists(path))
                 {
-                    StreamWriter sw = new StreamWriter(path, true, System.Text.Encoding.Default);
-                    string c = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + type + "-->" + content;
-                    Console.WriteLine(c);
-                    sw.WriteLine(c);
-                    //  sw.WriteLine("----------------------------------------");
-                    sw.Close();
+                    try
+                    {
+                        StreamWriter sw = new StreamWriter(path, true, System.Text.Encoding.Default);
+                        string c = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + type + "-->" + content;
+                        Console.WriteLine(c);
+                        sw.WriteLine(c);
+                        //  sw.WriteLine("----------------------------------------");
+                        sw.Close();
+                    }catch(Exception ex)
+                    {
+                        Console.WriteLine(ex.StackTrace);
+                    }
                 }
             }
         }

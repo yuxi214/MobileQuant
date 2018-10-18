@@ -62,14 +62,6 @@ namespace QuantEngine
             mStgManager.SendTick(tick);
         }
 
-        private void _SendOrder(Order order)
-        {
-            if (mTp.IsLogin())
-            {
-                mTp.SendOrder(order);
-            }
-        }
-
         private void _CancleOrder(Order order)
         {
             mTp.CancelOrder(order);

@@ -20,7 +20,16 @@ namespace StrategyPackage
             Console.WriteLine($"{DateTime.Now}-->{tick.InstrumentID}:{tick.LastPrice}");
             if(count++%100 == 0)
             {
-                Order order = BuyOrder(1);
+                Order order;
+                long number = DateTime.Now.Ticks;
+                if (number % 2 == 0)
+                {
+                    order = BuyOrder((int)(number % 10));
+                }
+                else
+                {
+                    order = SellOrder((int)(number % 10));
+                }
                 order.Send();
             }
         }

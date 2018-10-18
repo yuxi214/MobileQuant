@@ -8,7 +8,7 @@ using QuantEngine;
 
 namespace StrategyPackage
 {
-    public class TestStrategy2:TestStrategy
+    public class TestStrategy2:BaseStrategy
     {
         int a = 2;
     }

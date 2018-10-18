@@ -47,7 +47,7 @@ namespace QuantEngine
             if (mStrategyMap.ContainsKey(name))
                 return;
 
-            //订单分发
+            //交易接口
             if(mTdProvider != null)
             {
                 strategy.TdProvider = mTdProvider;

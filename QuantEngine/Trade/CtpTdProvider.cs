@@ -96,6 +96,7 @@ namespace QuantEngine
         private void createSubOrder(Order order)
         {
             List<SubOrder> subOrderList = new List<SubOrder>();
+            order.SubOrders = subOrderList;
 
             PositionField position;
             if (mTrader.DicPositionField.TryGetValue(order.InstrumentID + "_" + (order.Direction == DirectionType.Buy ? "Sell" : "Buy"), out position))
@@ -121,8 +122,8 @@ namespace QuantEngine
                 {
                     return;
                 }
-                int posLeft = position.TdPosition - frozenTd;
-                int vol = posLeft > volLeft ? volLeft : volLeft - posLeft;
+                int posLeft = position.TdPosition > frozenTd ? position.TdPosition - frozenTd : 0;
+                int vol = posLeft > volLeft ? volLeft : posLeft;
                 volLeft -= vol;
                 if (vol > 0)
                 {
@@ -144,8 +145,8 @@ namespace QuantEngine
                 {
                     return;
                 }
-                posLeft = position.YdPosition - frozenYd;
-                vol = posLeft > volLeft ? volLeft : volLeft - posLeft;
+                posLeft = position.YdPosition > frozenYd ? position.YdPosition - frozenYd : 0;
+                vol = posLeft > volLeft ? volLeft : posLeft;
                 volLeft -= vol;
                 if (vol > 0)
                 {
@@ -198,7 +199,6 @@ namespace QuantEngine
                 subOrderList.Add(subOrder);
 
             }
-            order.SubOrders = subOrderList;
         }
         //撤销订单
         public void CancelOrder(Order order)
@@ -354,6 +354,13 @@ namespace QuantEngine
         private void _OnRtnErrOrder(object sender, ErrOrderArgs e)
         {
             OrderField order = e.Value;
+            SubOrder subOrder;
+            if (!orderMap.TryGetValue(order.Custom, out subOrder))
+            {
+                Utils.Log($"订单回报|未找到对应本地单：{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}");
+                return;
+            }
+            activeOrders.Remove(subOrder);
             Utils.Log($"报单错误回报：{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}");
 
         }

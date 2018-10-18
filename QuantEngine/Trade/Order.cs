@@ -197,7 +197,10 @@ namespace QuantEngine
 
             //订单状态变化
             strategy.UpdateOrder(this);
-            OnChanged(this);
+            if(OnChanged != null)
+            {
+                OnChanged(this);
+            }
         }
 
         public override string ToString()
@@ -281,19 +284,35 @@ namespace QuantEngine
 
         internal void EmitTrade(int vol)
         {
-            OnTraded(vol, this);
+            if(OnTraded != null)
+            {
+                OnTraded(vol, this);
+            }
+
         }
         internal void EmitError()
         {
-            OnError(this);
+            if(OnError != null)
+            {
+                OnError(this);
+            }
+
         }
         internal void EmitCancel()
         {
-            OnCanceled(this);
+            if(OnCanceled != null)
+            {
+                OnCanceled(this);
+            }
+
         }
         internal void EmitCancelFailed()
         {
-            OnCancelFailed(this);
+            if(OnCancelFailed != null)
+            {
+                OnCancelFailed(this);
+            }
+
         }
 
         public string OrderID
@@ -377,7 +396,7 @@ namespace QuantEngine
             }
             set
             {
-                VolumeLeft = value;
+                volumeLeft = value;
             }
         }
 
