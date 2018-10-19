@@ -12,8 +12,8 @@ namespace MobileQuant
     {
         static void Main(string[] args)
         {
-            //try
-            //{
+            try
+            {
                 //启动引擎
                 Engine eg = Engine.Instance;
                 eg.Run();
@@ -30,11 +30,11 @@ namespace MobileQuant
                             break;
                     }
                 }
-            //}
-            //catch(Exception ex)
-            //{
-            //    Utils.Log(ex.ToString());
-            //}
         }
+            catch(Exception ex)
+            {
+                Utils.Log(ex.ToString());
+            }
+}
     }
 }

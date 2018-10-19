@@ -13,7 +13,7 @@ namespace QuantEngine
         public virtual void OnStop() { }
         public virtual string[] OnLoadInstrument() { return new string[] { }; }
         public virtual void OnTick(Tick tick) { }
-        public virtual void OnPositionChanged(string instrumentID,int position) { }
+        public virtual void OnPositionChanged(string instrumentID, int position) { }
     }
 
     //行情
@@ -31,7 +31,7 @@ namespace QuantEngine
         {
             string[] instIDs = OnLoadInstrument();
             //添加合约
-            for(int i=0;i<instIDs.Length;i++)
+            for (int i = 0; i < instIDs.Length; i++)
             {
                 if (i == 0)
                 {
@@ -52,6 +52,7 @@ namespace QuantEngine
         }
     }
 
+    //交易
     public partial class BaseStrategy
     {
         //交易接口
@@ -65,13 +66,21 @@ namespace QuantEngine
         }
 
         //持仓
-        private int mPosition = 0;
-        public int Position
+        private Dictionary<string, int> mPositionMap = new Dictionary<string, int>();
+        public int GetPosition(string instrumentID)
         {
-            get
+            if (mPositionMap.ContainsKey(instrumentID))
             {
-                return mPosition;
+                return mPositionMap[instrumentID];
             }
+            else
+            {
+                return 0;
+            }
+        }
+        internal void AddPosition(string instrumentID, int vol)
+        {
+            mPositionMap[instrumentID] = mPositionMap.ContainsKey(instrumentID) ? mPositionMap[instrumentID] + vol : vol;
         }
 
         //订单
@@ -102,7 +111,7 @@ namespace QuantEngine
         //更新订单
         internal void UpdateOrder(Order order)
         {
-            if(order.Status == OrderStatus.Canceled
+            if (order.Status == OrderStatus.Canceled
                 || order.Status == OrderStatus.Error
                 || order.Status == OrderStatus.Filled)
             {
@@ -132,6 +141,10 @@ namespace QuantEngine
         }
         public Order BuyOrder(int vol, double price, string instrumentID)
         {
+            if (vol < 0)
+            {
+                return BuyOrder(0, price, instrumentID);
+            }
             Order order = new Order(this, instrumentID, DirectionType.Buy, price, DateTime.Now, vol, vol, OrderStatus.Normal);
             return order;
         }
@@ -155,18 +168,23 @@ namespace QuantEngine
         }
         public Order SellOrder(int vol, double price, string instrumentID)
         {
+            if (vol < 0)
+            {
+                return SellOrder(0, price, instrumentID);
+            }
             Order order = new Order(this, instrumentID, DirectionType.Sell, price, DateTime.Now, vol, vol, OrderStatus.Normal);
             return order;
         }
         public Order ToPositionOrder(int position)
         {
-            if (position > mPosition && lastTickMap.ContainsKey(mMainInstID))
+            int myPos = GetPosition(mMainInstID);
+            if (position > myPos && lastTickMap.ContainsKey(mMainInstID))
             {
-                return BuyOrder(position - mPosition, lastTickMap[mMainInstID].UpperLimitPrice, mMainInstID);
+                return BuyOrder(position - myPos, lastTickMap[mMainInstID].UpperLimitPrice, mMainInstID);
             }
-            else if (position < mPosition && lastTickMap.ContainsKey(mMainInstID))
+            else if (position < myPos && lastTickMap.ContainsKey(mMainInstID))
             {
-                return SellOrder(mPosition - position, lastTickMap[mMainInstID].LowerLimitPrice, mMainInstID);
+                return SellOrder(myPos - position, lastTickMap[mMainInstID].LowerLimitPrice, mMainInstID);
             }
             else
             {
@@ -179,13 +197,14 @@ namespace QuantEngine
         }
         public Order ToPositionOrder(int position, double price, string instrumentID)
         {
-            if(position > mPosition)
+            int myPos = GetPosition(mMainInstID);
+            if (position > myPos)
             {
-                return BuyOrder(position - mPosition, price, instrumentID);
+                return BuyOrder(position - myPos, price, instrumentID);
             }
-            else if(position < mPosition)
+            else if (position < myPos)
             {
-                return SellOrder(mPosition - position, price, instrumentID);
+                return SellOrder(myPos - position, price, instrumentID);
             }
             else
             {

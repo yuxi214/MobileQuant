@@ -11,46 +11,46 @@ namespace QuantEngine
     public class Order
     {
         //策略
-        private BaseStrategy strategy;
+        private BaseStrategy mStrategy;
         //合约
-        private string instrumentID = string.Empty;
+        private string mInstrumentID = string.Empty;
         //买卖
-        private DirectionType direction = DirectionType.Buy;
+        private DirectionType mDirection = DirectionType.Buy;
         //报价
-        private double price = 0d;
+        private double mPrice = 0d;
         //报单时间(本地时间)
-        private DateTime orderTime = DateTime.Now;
+        private DateTime mOrderTime = DateTime.Now;
         //报单数量
-        private int volume = 0;
+        private int mVolume = 0;
         //成交数量
-        private int volumeTraded = 0;
+        private int mVolumeTraded = 0;
         //未成交
-        private int volumeLeft = 0;
+        private int mVolumeLeft = 0;
         //状态
-        private OrderStatus status = OrderStatus.Normal;
+        private OrderStatus mStatus = OrderStatus.Normal;
         //子订单
-        private List<SubOrder> subOrders;
+        private List<SubOrder> mSubOrders;
 
         //事件
         public event OrderChanged OnChanged;
 
         public Order(BaseStrategy strategy, string instrumentID, DirectionType direction, double price, DateTime orderTime, int volume, int volumeLeft, OrderStatus status)
         {
-            this.strategy = strategy;
-            this.instrumentID = instrumentID;
-            this.direction = direction;
-            this.price = price;
-            this.orderTime = orderTime;
-            this.volume = volume;
-            this.volumeLeft = volumeLeft;
-            this.status = status;
+            this.mStrategy = strategy;
+            this.mInstrumentID = instrumentID;
+            this.mDirection = direction;
+            this.mPrice = price;
+            this.mOrderTime = orderTime;
+            this.mVolume = volume;
+            this.mVolumeLeft = volumeLeft;
+            this.mStatus = status;
         }
 
         public string InstrumentID
         {
             get
             {
-                return instrumentID;
+                return mInstrumentID;
             }
         }
 
@@ -58,7 +58,7 @@ namespace QuantEngine
         {
             get
             {
-                return direction;
+                return mDirection;
             }
         }
 
@@ -66,7 +66,7 @@ namespace QuantEngine
         {
             get
             {
-                return price;
+                return mPrice;
             }
         }
 
@@ -74,7 +74,7 @@ namespace QuantEngine
         {
             get
             {
-                return volume;
+                return mVolume;
             }
         }
 
@@ -82,7 +82,7 @@ namespace QuantEngine
         {
             get
             {
-                return volumeLeft;
+                return mVolumeLeft;
             }
         }
 
@@ -90,7 +90,7 @@ namespace QuantEngine
         {
             get
             {
-                return status;
+                return mStatus;
             }
         }
 
@@ -98,7 +98,7 @@ namespace QuantEngine
         {
             get
             {
-                return orderTime;
+                return mOrderTime;
             }
         }
 
@@ -106,7 +106,7 @@ namespace QuantEngine
         {
             get
             {
-                return strategy;
+                return mStrategy;
             }
         }
 
@@ -114,13 +114,13 @@ namespace QuantEngine
         {
             set
             {
-                if (subOrders != null)
+                if (mSubOrders != null)
                     return;
 
-                subOrders = value;
-                if (subOrders == null)
+                mSubOrders = value;
+                if (mSubOrders == null)
                     return;
-                foreach (SubOrder sOrder in subOrders)
+                foreach (SubOrder sOrder in mSubOrders)
                 {
                     sOrder.OnError += (SubOrder order) =>
                     {
@@ -128,6 +128,15 @@ namespace QuantEngine
                     };
                     sOrder.OnTraded += (int vol, SubOrder order) =>
                     {
+                        if(order.Direction == DirectionType.Buy)
+                        {
+                            mStrategy.AddPosition(order.InstrumentID, vol);
+                        }
+                        else
+                        {
+                            mStrategy.AddPosition(order.InstrumentID, -vol);
+                        }
+
                         refresh();
                     };
                     sOrder.OnCanceled += (SubOrder order) =>
@@ -142,14 +151,14 @@ namespace QuantEngine
             }
             get
             {
-                return subOrders;
+                return mSubOrders;
             }
         }
 
         //刷新订单状态
         private void refresh()
         {
-            if (subOrders != null)
+            if (mSubOrders != null)
                 return;
 
             int left = 0;
@@ -162,7 +171,7 @@ namespace QuantEngine
             bool cancled = true;
 
             //统计
-            foreach (SubOrder sOrder in subOrders)
+            foreach (SubOrder sOrder in mSubOrders)
             {
                 left += sOrder.VolumeLeft;
                 traded += sOrder.VolumeTraded;
@@ -173,30 +182,30 @@ namespace QuantEngine
                 cancled = cancled && sOrder.Status == OrderStatus.Canceled;
             }
 
-            volumeLeft = left;
-            volumeTraded = traded;
+            mVolumeLeft = left;
+            mVolumeTraded = traded;
 
             //状态
             if (normal)
             {
-                status = OrderStatus.Normal;
+                mStatus = OrderStatus.Normal;
             }else if (filled)
             {
-                status = OrderStatus.Filled;
+                mStatus = OrderStatus.Filled;
             }else if (error)
             {
-                status = OrderStatus.Error;
+                mStatus = OrderStatus.Error;
             }else if (cancled)
             {
-                status = OrderStatus.Canceled;
+                mStatus = OrderStatus.Canceled;
             }
             else
             {
-                status = OrderStatus.Partial;
+                mStatus = OrderStatus.Partial;
             }
 
             //订单状态变化
-            strategy.UpdateOrder(this);
+            mStrategy.UpdateOrder(this);
             if(OnChanged != null)
             {
                 OnChanged(this);
@@ -205,18 +214,18 @@ namespace QuantEngine
 
         public override string ToString()
         {
-            return $"{instrumentID},{direction},{price},{volume},{volumeLeft},{Status}";
+            return $"{mInstrumentID},{mDirection},{mPrice},{mVolume},{mVolumeLeft},{Status}";
         }
 
         //发送订单
         public void Send()
         {
-            strategy.SendOrder(this);
+            mStrategy.SendOrder(this);
         }
 
         public void Cancle()
         {
-            strategy.CancleOrder(this);
+            mStrategy.CancleOrder(this);
         }
     }
 

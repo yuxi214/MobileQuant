@@ -8,7 +8,7 @@ using QuantEngine;
 
 namespace StrategyPackage
 {
-    public class TestStrategy:BaseStrategy
+    public class TestStrategy : BaseStrategy
     {
         public override string[] OnLoadInstrument()
         {
@@ -18,17 +18,21 @@ namespace StrategyPackage
         public override void OnTick(Tick tick)
         {
             Console.WriteLine($"{DateTime.Now}-->{tick.InstrumentID}:{tick.LastPrice}");
-            if(count++%100 == 0)
+            Random r = new Random();
+            int number = r.Next(0,1000);
+            if (count++ % number == 0)
             {
+                int pos = GetPosition(tick.InstrumentID);
+                int vol = r.Next(1,10);
+
                 Order order;
-                long number = DateTime.Now.Ticks;
                 if (number % 2 == 0)
                 {
-                    order = BuyOrder((int)(number % 10));
+                    order = BuyOrder(vol - pos % 2, tick.AskPrice, tick.InstrumentID);
                 }
                 else
                 {
-                    order = SellOrder((int)(number % 10));
+                    order = SellOrder(vol + pos % 2, tick.AskPrice, tick.InstrumentID);
                 }
                 order.Send();
             }
