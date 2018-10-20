@@ -19,7 +19,7 @@ namespace StrategyPackage
         {
             Console.WriteLine($"{DateTime.Now}-->{tick.InstrumentID}:{tick.LastPrice}");
             Random r = new Random();
-            int number = r.Next(0,1000);
+            int number = r.Next(1,1000);
             if (count++ % number == 0)
             {
                 int pos = GetPosition(tick.InstrumentID);
@@ -28,11 +28,11 @@ namespace StrategyPackage
                 Order order;
                 if (number % 2 == 0)
                 {
-                    order = BuyOrder(vol - pos % 2, tick.AskPrice, tick.InstrumentID);
+                    order = BuyOrder(vol - pos % 3, tick.AskPrice, tick.InstrumentID);
                 }
                 else
                 {
-                    order = SellOrder(vol + pos % 2, tick.AskPrice, tick.InstrumentID);
+                    order = SellOrder(vol + pos % 3, tick.AskPrice, tick.InstrumentID);
                 }
                 order.Send();
             }

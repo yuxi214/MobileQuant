@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 
 namespace QuantEngine
@@ -32,7 +33,7 @@ namespace QuantEngine
             {
                 mTdProvider = value;
                 //设置策略的交易接口
-                foreach(BaseStrategy stg in mStrategyMap.Values)
+                foreach (BaseStrategy stg in mStrategyMap.Values)
                 {
                     stg.TdProvider = mTdProvider;
                 }
@@ -48,7 +49,7 @@ namespace QuantEngine
                 return;
 
             //交易接口
-            if(mTdProvider != null)
+            if (mTdProvider != null)
             {
                 strategy.TdProvider = mTdProvider;
             }
@@ -56,10 +57,10 @@ namespace QuantEngine
             //行情映射
             mStrategyMap.Add(name, strategy);
             string[] instIDs = strategy.OnLoadInstrument();
-            foreach(string instID in instIDs)
+            foreach (string instID in instIDs)
             {
                 HashSet<BaseStrategy> strategySet;
-                if(!mInstIDStrategyMap.TryGetValue(instID, out strategySet))
+                if (!mInstIDStrategyMap.TryGetValue(instID, out strategySet))
                 {
                     strategySet = new HashSet<BaseStrategy>();
                 }
@@ -73,18 +74,33 @@ namespace QuantEngine
 
         private void loadStrategy()
         {
-            Assembly assembly = Assembly.LoadFrom(AppDomain.CurrentDomain.BaseDirectory + "\\StrategyPackage.dll");
-            Type[] types = assembly.GetTypes();
-            foreach(Type t in types)
+            //获取文件列表 
+            string[] files = new string[] { };
+            try
             {
-                if (!t.IsSubclassOf(typeof(BaseStrategy)))
-                    continue;
+                files = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "\\strategys");
+            }
+            catch (Exception ex)
+            {
+                Utils.Log(ex.StackTrace);
+            }
 
-                BaseStrategy stg = Activator.CreateInstance(t) as BaseStrategy;
-                if (stg == null)
-                    continue;
+            //加载策略
+            foreach (string f in files)
+            {
+                Assembly assembly = Assembly.LoadFrom(f);
+                Type[] types = assembly.GetTypes();
+                foreach (Type t in types)
+                {
+                    if (!t.IsSubclassOf(typeof(BaseStrategy)))
+                        continue;
 
-                addStrategy(t.Name, stg);
+                    BaseStrategy stg = Activator.CreateInstance(t) as BaseStrategy;
+                    if (stg == null)
+                        continue;
+
+                    addStrategy(t.Name, stg);
+                }
             }
         }
 
@@ -94,7 +110,7 @@ namespace QuantEngine
         {
             return mInstIDStrategyMap.Keys.ToArray<string>();
         }
-        
+
 
         //行情分发
         private Dictionary<string, HashSet<BaseStrategy>> mInstIDStrategyMap = new Dictionary<string, HashSet<BaseStrategy>>();
