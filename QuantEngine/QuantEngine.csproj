@@ -88,6 +88,7 @@
     <Compile Include="MarketData\Tick.cs" />
     <Compile Include="MarketData\ITickFilter.cs" />
     <Compile Include="Trade\Account.cs" />
+    <Compile Include="Trade\Position.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>

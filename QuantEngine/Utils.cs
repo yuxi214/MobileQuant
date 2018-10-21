@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Threading;
 
 using Newtonsoft.Json;
 
@@ -11,12 +13,37 @@ namespace QuantEngine
 {
     public class Utils
     {
-
-
         //日志
+        private static Thread mThread;
+        private static BlockingCollection<string> mQueue = new BlockingCollection<string>();
         public static void Log(string content)
         {
-            WriteLogs("Logs", "", content);
+            try
+            {
+                //最多缓存1000条log
+                if (mQueue.Count < 1000)
+                {
+                    mQueue.TryAdd(content, 1000);
+                }
+
+                //异步写日志
+                if (mThread == null || !mThread.IsAlive)
+                {
+                    mThread = new Thread(() =>
+                    {
+                        while (true)
+                        {
+                            string c = mQueue.Take();
+                            WriteLogs("Logs", "", c);
+                        }
+
+                    });
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
         }
         private static void WriteLogs(string fileName, string type, string content)
         {
@@ -41,18 +68,12 @@ namespace QuantEngine
                 }
                 if (File.Exists(path))
                 {
-                    try
-                    {
-                        StreamWriter sw = new StreamWriter(path, true, System.Text.Encoding.Default);
-                        string c = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + type + "-->" + content;
-                        Console.WriteLine(c);
-                        sw.WriteLine(c);
-                        //  sw.WriteLine("----------------------------------------");
-                        sw.Close();
-                    }catch(Exception ex)
-                    {
-                        Console.WriteLine(ex.StackTrace);
-                    }
+                    StreamWriter sw = new StreamWriter(path, true, System.Text.Encoding.Default);
+                    string c = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + type + "-->" + content;
+                    Console.WriteLine(c);
+                    sw.WriteLine(c);
+                    //  sw.WriteLine("----------------------------------------");
+                    sw.Close();
                 }
             }
         }
