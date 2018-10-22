@@ -43,6 +43,7 @@ namespace QuantEngine
         private DataManager()
         {
             CreateDb();
+            mQueue.OnMessage += _onMessage;
         }
 
         private void CreateDb()
@@ -58,30 +59,21 @@ namespace QuantEngine
             SQLiteHelper.ExecuteNonQuery(SQL_CREATE_T_ORDER);
         }
 
-        //执行线程
-        Thread mThread;
-        private void run()
+        private MessageQueue mQueue = new MessageQueue(10000);
+        
+        private void _onMessage(Message message)
         {
-            if(mThread == null || !mThread.IsAlive)
+            switch (message.Type)
             {
-                mThread = new Thread(()=> {
-                    while (true)
-                    {
-                        try
-                        {
-                            execute();
-                        }
-                        catch (Exception ex)
-                        {
-                            Utils.Log(ex.StackTrace);
-                        }
-                    }
-                });
+                case MessageType.position:
+                    Position p = (Position)message.Value;
+                    savePosition(p);
+                    break;
+                case MessageType.order:
+                    Order o = (Order)message.Value;
+                    saveOrder(o);
+                    break;
             }
-        }
-        private void execute()
-        {
-            kjlkj;l
         }
 
         //持仓
@@ -90,24 +82,23 @@ namespace QuantEngine
             string sql = @" select position from t_position where strategy_name = '"+strategyName+"'";
             return (int)SQLiteHelper.ExecuteScalar(sql);
         }
-        private BlockingCollection<Position> mPositionQueue = new BlockingCollection<Position>();
         public void SetPosition(Position position)
         {
-            //最多缓存1000条
-            if(mPositionQueue.Count < 1000)
-            {
-                mPositionQueue.TryAdd(position, 1000);
-            }
+            mQueue.add(MessageType.position, position);
+        }
+        private void savePosition(Position p)
+        {
+            dsfadsfdsaf
         }
 
         //订单
-        private BlockingCollection<Order> mOrderQueue = new BlockingCollection<Order>();
         public void AddOrder(Order order)
         {
-            if(mPositionQueue.Count < 1000)
-            {
-                mOrderQueue.TryAdd(order, 1000);
-            }
+            mQueue.add(MessageType.order, order);
+        }
+        private void saveOrder(Order o)
+        {
+            asdfadsf
         }
     }
 }

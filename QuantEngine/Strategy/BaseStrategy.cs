@@ -212,4 +212,13 @@ namespace QuantEngine
             }
         }
     }
+
+    //其他
+    public partial class BaseStrategy
+    {
+        public void Log(string content)
+        {
+            Utils.UserLog(content);
+        }
+    }
 }

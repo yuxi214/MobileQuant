@@ -14,38 +14,75 @@ namespace QuantEngine
     public class Utils
     {
         //日志
-        private static Thread mThread;
-        private static BlockingCollection<string> mQueue = new BlockingCollection<string>();
-        public static void Log(string content)
+        private class Log
         {
-            try
+            string fileName;
+            string content;
+
+            public Log(string fileName, string content)
             {
-                //最多缓存1000条log
-                if (mQueue.Count < 1000)
-                {
-                    mQueue.TryAdd(content, 1000);
-                }
+                this.fileName = fileName;
+                this.content = content;
+            }
 
-                //异步写日志
-                if (mThread == null || !mThread.IsAlive)
+            public string FileName
+            {
+                get
                 {
-                    mThread = new Thread(() =>
-                    {
-                        while (true)
-                        {
-                            string c = mQueue.Take();
-                            WriteLogs("Logs", "", c);
-                        }
-
-                    });
+                    return fileName;
                 }
             }
-            catch(Exception ex)
+
+            public string Content
             {
-                Console.WriteLine(ex);
+                get
+                {
+                    return content;
+                }
             }
         }
-        private static void WriteLogs(string fileName, string type, string content)
+        private static Thread mThread;
+        private static BlockingCollection<Log> mQueue = new BlockingCollection<Log>();
+        internal static void EnginLog(string content)
+        {
+            Log l = new Log("enginLog", content);
+            log(l);
+        }
+        internal static void UserLog(string content)
+        {
+            Log l = new Log("userLog", content);
+            log(l);
+        }
+        private static void log(Log log)
+        {
+            //最多缓存1000条log
+            if (mQueue.Count < 1000)
+            {
+                mQueue.TryAdd(log);
+            }
+
+            //异步写日志
+            if (mThread == null || !mThread.IsAlive)
+            {
+                mThread = new Thread(() =>
+                {
+                    while (true)
+                    {
+                        Log l = mQueue.Take();
+                        try
+                        {
+                            writeLogs(l.FileName, "", l.Content);
+                        }catch(Exception ex)
+                        {
+                            Console.WriteLine(ex.StackTrace);
+                        }
+                    }
+
+                });
+                mThread.Start();
+            }
+        }
+        private static void writeLogs(string fileName, string type, string content)
         {
             string path = AppDomain.CurrentDomain.BaseDirectory;
             if (!string.IsNullOrEmpty(path))
@@ -55,12 +92,7 @@ namespace QuantEngine
                 {
                     Directory.CreateDirectory(path);
                 }
-                //path = path + "\\" + DateTime.Now.ToString("yyyyMMdd");
-                //if (!Directory.Exists(path))
-                //{
-                //    Directory.CreateDirectory(path);
-                //}
-                path = path + "\\" + DateTime.Now.ToString("yyyyMMdd") + ".txt";
+                path = path + "\\log\\" + DateTime.Now.ToString("yyyyMMdd") + ".txt";
                 if (!File.Exists(path))
                 {
                     FileStream fs = File.Create(path);
@@ -72,7 +104,6 @@ namespace QuantEngine
                     string c = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + type + "-->" + content;
                     Console.WriteLine(c);
                     sw.WriteLine(c);
-                    //  sw.WriteLine("----------------------------------------");
                     sw.Close();
                 }
             }

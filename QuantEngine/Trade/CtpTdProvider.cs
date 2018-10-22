@@ -40,17 +40,17 @@ namespace QuantEngine
             mTrader.OnFrontConnected += (object sender, EventArgs e) =>
             {
                 mTrader.ReqUserLogin(account.Investor, account.Password, account.Broker);
-                Utils.Log("ctptd:OnFrontConnected");
+                Utils.EnginLog("ctptd:OnFrontConnected");
             };
             //登入
             mTrader.OnRspUserLogin += (object sender, IntEventArgs e) =>
             {
-                Utils.Log("ctptd:OnRspUserLogin:" + e.Value);
+                Utils.EnginLog("ctptd:OnRspUserLogin:" + e.Value);
             };
             //登出
             mTrader.OnRspUserLogout += (object sender, IntEventArgs e) =>
             {
-                Utils.Log("ctptd:OnRspUserLogout");
+                Utils.EnginLog("ctptd:OnRspUserLogout");
             };
             //订单回报
             mTrader.OnRtnOrder += _OnRtnOrder;
@@ -81,7 +81,7 @@ namespace QuantEngine
             //未登录，则返回
             if (!IsLogin())
             {
-                Utils.Log("ctptd:交易未登录，下单失败");
+                Utils.EnginLog("ctptd:交易未登录，下单失败");
                 return;
             }
 
@@ -207,12 +207,12 @@ namespace QuantEngine
             {
                 if (subOrder.OrderID.Equals(string.Empty))
                 {
-                    Utils.Log($"撤单错误|未找到订单编号：{subOrder.InstrumentID}|{subOrder.Direction}|{subOrder.Offset}|{subOrder.LimitPrice}|{subOrder.Volume}|{subOrder.CustomID}");
+                    Utils.EnginLog($"撤单错误|未找到订单编号：{subOrder.InstrumentID}|{subOrder.Direction}|{subOrder.Offset}|{subOrder.LimitPrice}|{subOrder.Volume}|{subOrder.CustomID}");
                     continue;
                 }
                 int rtn;
                 rtn = mTrader.ReqOrderAction(subOrder.OrderID);
-                Utils.Log($"撤单：{rtn}|{subOrder.InstrumentID}|{subOrder.Direction}|{subOrder.Offset}|{subOrder.LimitPrice}|{subOrder.Volume}|{subOrder.CustomID}|{subOrder.OrderID}");
+                Utils.EnginLog($"撤单：{rtn}|{subOrder.InstrumentID}|{subOrder.Direction}|{subOrder.Offset}|{subOrder.LimitPrice}|{subOrder.Volume}|{subOrder.CustomID}|{subOrder.OrderID}");
             }
         }
         //发送订单
@@ -249,18 +249,18 @@ namespace QuantEngine
                 pType: OrderType.Limit,
                 pHedge: HedgeType.Speculation);
 
-            Utils.Log($"发单：{rtn}|{subOrder.InstrumentID}|{subOrder.Direction}|{subOrder.Offset}|{subOrder.LimitPrice}|{subOrder.Volume}|{subOrder.CustomID}");
+            Utils.EnginLog($"发单：{rtn}|{subOrder.InstrumentID}|{subOrder.Direction}|{subOrder.Offset}|{subOrder.LimitPrice}|{subOrder.Volume}|{subOrder.CustomID}");
         }
         //撤销订单
         private void CancelOrder(SubOrder subOrder)
         {
             if (subOrder.OrderID == string.Empty)
             {
-                Utils.Log($"撤单|错误|还未更新orderID：{subOrder.CustomID}|{subOrder.InstrumentID}|{subOrder.Direction}|{subOrder.Offset}|{subOrder.LimitPrice}");
+                Utils.EnginLog($"撤单|错误|还未更新orderID：{subOrder.CustomID}|{subOrder.InstrumentID}|{subOrder.Direction}|{subOrder.Offset}|{subOrder.LimitPrice}");
                 return;
             }
             mTrader.ReqOrderAction(subOrder.OrderID);
-            Utils.Log($"撤单：{subOrder.OrderID}|{subOrder.InstrumentID}|{subOrder.Direction}|{subOrder.Offset}|{subOrder.LimitPrice}|{subOrder.Volume}|{subOrder.VolumeLeft}");
+            Utils.EnginLog($"撤单：{subOrder.OrderID}|{subOrder.InstrumentID}|{subOrder.Direction}|{subOrder.Offset}|{subOrder.LimitPrice}|{subOrder.Volume}|{subOrder.VolumeLeft}");
         }
         //撤单回报
         private void _OnRtnCancel(object sender, OrderArgs e)
@@ -269,11 +269,11 @@ namespace QuantEngine
             SubOrder subOrder;
             if (!orderMap.TryGetValue(order.Custom, out subOrder))
             {
-                Utils.Log($"撤单回报|未找到对应本地单：{order.Custom}\t{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}");
+                Utils.EnginLog($"撤单回报|未找到对应本地单：{order.Custom}\t{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}");
                 return;
             }
             subOrder.EmitCancel();
-            Utils.Log($"撤单回报：{order.Custom}\t{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}");
+            Utils.EnginLog($"撤单回报：{order.Custom}\t{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}");
         }
         //撤单错误
         private void _OnRtnErrCancel(object sender, ErrOrderArgs e)
@@ -282,18 +282,18 @@ namespace QuantEngine
             SubOrder subOrder;
             if (!orderMap.TryGetValue(order.Custom, out subOrder))
             {
-                Utils.Log($"撤单错误回报|未找到对应本地单：{order.Custom}\t{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}");
+                Utils.EnginLog($"撤单错误回报|未找到对应本地单：{order.Custom}\t{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}");
                 return;
             }
             subOrder.EmitCancelFailed();
-            Utils.Log($"撤单错误回报：{order.Custom}\t{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}");
+            Utils.EnginLog($"撤单错误回报：{order.Custom}\t{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}");
 
         }
         //交易回报
         private void _OnRtnTrade(object sender, TradeArgs e)
         {
             TradeField trade = e.Value;
-            Utils.Log($"交易回报：{trade.OrderID}\t{trade.InstrumentID}\t{trade.Direction}\t{trade.Offset}\t{trade.Price}\t{trade.Volume}");
+            Utils.EnginLog($"交易回报：{trade.OrderID}\t{trade.InstrumentID}\t{trade.Direction}\t{trade.Offset}\t{trade.Price}\t{trade.Volume}");
         }
         //订单回报
         private void _OnRtnOrder(object sender, OrderArgs e)
@@ -302,7 +302,7 @@ namespace QuantEngine
             SubOrder subOrder;
             if (!orderMap.TryGetValue(order.Custom, out subOrder))
             {
-                Utils.Log($"订单回报|未找到对应本地单：{order.Custom}\t{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}");
+                Utils.EnginLog($"订单回报|未找到对应本地单：{order.Custom}\t{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}");
                 return;
             }
 
@@ -340,7 +340,7 @@ namespace QuantEngine
                 subOrder.EmitTrade(tradeVol);
             }
 
-            Utils.Log($"订单回报：{order.Custom}\t{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}");
+            Utils.EnginLog($"订单回报：{order.Custom}\t{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}");
         }
         //报单错误回报
         private void _OnRtnErrOrder(object sender, ErrOrderArgs e)
@@ -349,12 +349,12 @@ namespace QuantEngine
             SubOrder subOrder;
             if (!orderMap.TryGetValue(order.Custom, out subOrder))
             {
-                Utils.Log($"错误回报|未找到对应本地单：{order.Custom}\t{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}");
+                Utils.EnginLog($"错误回报|未找到对应本地单：{order.Custom}\t{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}");
                 return;
             }
             activeOrders.Remove(subOrder);
             subOrder.EmitError();
-            Utils.Log($"报单错误回报：{order.Custom}\t{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}");
+            Utils.EnginLog($"报单错误回报：{order.Custom}\t{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}");
 
         }
     }

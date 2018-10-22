@@ -74,6 +74,7 @@
   <ItemGroup>
     <Compile Include="Data\Config.cs" />
     <Compile Include="Data\DataManager.cs" />
+    <Compile Include="Data\MessageQueue.cs" />
     <Compile Include="Data\SqliteHelper.cs" />
     <Compile Include="MarketData\CtpMdProvider.cs" />
     <Compile Include="Trade\CtpTdProvider.cs" />

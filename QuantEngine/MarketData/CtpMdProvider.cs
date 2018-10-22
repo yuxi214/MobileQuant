@@ -40,18 +40,18 @@ namespace QuantEngine
             mQuoter.OnFrontConnected += (object sender, EventArgs e) =>
             {
                 mQuoter.ReqUserLogin(account.Investor, account.Password, account.Broker);
-                Utils.Log("ctpmd:OnFrontConnected");
+                Utils.EnginLog("ctpmd:OnFrontConnected");
             };
             //登陆回调
             mQuoter.OnRspUserLogin += (object sender, IntEventArgs e) =>
             {
                 mQuoter.ReqSubscribeMarketData(mSubscribeMap.Keys.ToArray<string>());
-                Utils.Log("ctpmd:OnRspUserLogin:" + e.Value);
+                Utils.EnginLog("ctpmd:OnRspUserLogin:" + e.Value);
             };
             //登出回调
             mQuoter.OnRspUserLogout += (object sender, IntEventArgs e) =>
             {
-                Utils.Log("ctpmd:OnRspUserLogout");
+                Utils.EnginLog("ctpmd:OnRspUserLogout");
             };
             //行情回调
             mQuoter.OnRtnTick += (object sender, TickEventArgs e) =>
@@ -73,7 +73,7 @@ namespace QuantEngine
                 }
                 catch (Exception ex)
                 {
-                    Utils.Log(ex.StackTrace);
+                    Utils.EnginLog(ex.StackTrace);
                 }
                 _time.AddMilliseconds(_md.UpdateMillisec);
 
@@ -86,7 +86,7 @@ namespace QuantEngine
             };
             mQuoter.OnRtnError += (object sender, ErrorEventArgs e) =>
             {
-                Utils.Log("OnRtnError：" + e.ErrorMsg);
+                Utils.EnginLog("OnRtnError：" + e.ErrorMsg);
             };
 
             //开始连接
