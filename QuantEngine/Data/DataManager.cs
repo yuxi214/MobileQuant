@@ -77,9 +77,9 @@ namespace QuantEngine
         }
 
         //持仓
-        public int GetPosition(string strategyName)
+        public int GetPosition(string strategyName,string instrumentID)
         {
-            string sql = @" select position from t_position where strategy_name = '"+strategyName+"'";
+            string sql = $@" select position from t_position where strategy_name = '{strategyName}' and instrument_id = '{instrumentID}'";
             return (int)SQLiteHelper.ExecuteScalar(sql);
         }
         public void SetPosition(Position position)
@@ -88,7 +88,11 @@ namespace QuantEngine
         }
         private void savePosition(Position p)
         {
-            dsfadsfdsaf
+            string sql = $@"replace into [t_position]
+                            ([strategy_name], [instrument_id], [position], [last_time]) 
+                            values
+                            ('{p.StrategyName}','{p.InstrumentID}',{p.Vol},'{p.LastTime}')";
+            SQLiteHelper.ExecuteNonQuery(sql);
         }
 
         //订单
@@ -98,7 +102,12 @@ namespace QuantEngine
         }
         private void saveOrder(Order o)
         {
-            asdfadsf
+            string direction = o.Direction == DirectionType.Buy ? "多" : "空";
+            string sql = $@"insert into [t_order]
+                            ([strategy_name], [instrument_id], [direction], [price], [volume], [volume_traded], [order_time])
+                            values
+                            ('{o.Strategy.GetType().Name}','{o.InstrumentID}','{direction}',{o.Price},{o.Volume},{o.Volume-o.VolumeLeft},'{o.OrderTime}')";
+            SQLiteHelper.ExecuteNonQuery(sql);
         }
     }
 }

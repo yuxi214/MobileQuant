@@ -30,14 +30,16 @@ namespace QuantEngine
         internal void SendStart()
         {
             string[] instIDs = OnLoadInstrument();
-            //添加合约
+            //添加合约以及持仓
             for (int i = 0; i < instIDs.Length; i++)
             {
+                string inst = instIDs[i];
                 if (i == 0)
                 {
-                    mMainInstID = instIDs[0];
+                    mMainInstID = inst;
                 }
-                mInstIDSet.Add(instIDs[i]);
+                mInstIDSet.Add(inst);
+                AddPosition(inst, DataManager.Instance.GetPosition(GetType().Name, inst));
             }
 
             //启动
@@ -81,6 +83,8 @@ namespace QuantEngine
         internal void AddPosition(string instrumentID, int vol)
         {
             mPositionMap[instrumentID] = mPositionMap.ContainsKey(instrumentID) ? mPositionMap[instrumentID] + vol : vol;
+            Position p = new Position(GetType().Name, instrumentID, mPositionMap[instrumentID], DateTime.Now);
+            DataManager.Instance.SetPosition(p);
         }
 
         //订单
@@ -117,6 +121,7 @@ namespace QuantEngine
             {
                 activeOrderList.Remove(order);
                 doneOrderList.Add(order);
+                DataManager.Instance.AddOrder(order);
             }
         }
 
