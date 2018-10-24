@@ -34,6 +34,15 @@ namespace StrategyPackage
                 {
                     order = SellOrder(vol + pos % 3, tick.AskPrice, tick.InstrumentID);
                 }
+                order.OnChanged += (Order o) => {
+                    if(o.Status == OrderStatus.Canceled
+                    || o.Status == OrderStatus.Error
+                    || o.Status == OrderStatus.Filled)
+                    {
+                        Log($"订单：{o.InstrumentID}\t{o.Direction}\t{o.Volume-o.VolumeLeft}");
+                        Log($"持仓:{o.InstrumentID}\t{GetPosition(o.InstrumentID)}");
+                    }
+                };
                 order.Send();
             }
         }

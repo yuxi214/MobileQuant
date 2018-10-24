@@ -31,7 +31,7 @@ namespace QuantEngine
         private static string CreateConnectionString()
         {
             SQLiteConnectionStringBuilder connectionString = new SQLiteConnectionStringBuilder();
-            connectionString.DataSource = @"Data/QuantData.db";
+            connectionString.DataSource = @"./Data/QuantData.db";
 
             string conStr = connectionString.ToString();
             return conStr;

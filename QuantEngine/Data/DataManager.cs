@@ -11,27 +11,6 @@ namespace QuantEngine
 {
     internal class DataManager
     {
-        //策略持仓
-        private static readonly string SQL_CREATE_T_POSITION =
-            @"CREATE TABLE [t_position](
-              [id] int PRIMARY KEY, 
-              [strategy_name] varchar(255), 
-              [instrument_id] varchar(20), 
-              [position] int, 
-              [last_time] datetime);";
-
-        //订单
-        private static readonly string SQL_CREATE_T_ORDER =
-            @"CREATE TABLE [t_order](
-              [id] int PRIMARY KEY, 
-              [strategy_name] varchar(255), 
-              [instrument_id] varchar(20), 
-              [direction] varchar(20), 
-              [price] float, 
-              [volume] int, 
-              [volume_traded], 
-              [order_time] datetime);";
-
         private static DataManager instance = new DataManager();
         public static DataManager Instance
         {
@@ -42,21 +21,7 @@ namespace QuantEngine
         }
         private DataManager()
         {
-            CreateDb();
             mQueue.OnMessage += _onMessage;
-        }
-
-        private void CreateDb()
-        {
-            string path = System.Environment.CurrentDirectory + @"/Data/QuantData.db";
-            if (File.Exists(path))
-            {
-                return;
-            }
-
-            SQLiteHelper.CreateDBFile("QuantData.db");
-            SQLiteHelper.ExecuteNonQuery(SQL_CREATE_T_POSITION);
-            SQLiteHelper.ExecuteNonQuery(SQL_CREATE_T_ORDER);
         }
 
         private MessageQueue mQueue = new MessageQueue(10000);
@@ -80,7 +45,8 @@ namespace QuantEngine
         public int GetPosition(string strategyName,string instrumentID)
         {
             string sql = $@" select position from t_position where strategy_name = '{strategyName}' and instrument_id = '{instrumentID}'";
-            return (int)SQLiteHelper.ExecuteScalar(sql);
+            object vol = SQLiteHelper.ExecuteScalar(sql);
+            return vol == null ? 0 : (int)(long)vol;
         }
         public void SetPosition(Position position)
         {

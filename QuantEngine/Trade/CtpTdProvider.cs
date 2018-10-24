@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 
 using HaiFeng;
 
@@ -45,6 +46,12 @@ namespace QuantEngine
             //登入
             mTrader.OnRspUserLogin += (object sender, IntEventArgs e) =>
             {
+                if(e.Value != 0)
+                {
+                    Thread.Sleep(1000 * 60);
+                    mTrader = new CTPTrade();
+                    mTrader.ReqConnect();
+                }
                 Utils.EnginLog("ctptd:OnRspUserLogin:" + e.Value);
             };
             //登出

@@ -87,12 +87,12 @@ namespace QuantEngine
             string path = AppDomain.CurrentDomain.BaseDirectory;
             if (!string.IsNullOrEmpty(path))
             {
-                path = AppDomain.CurrentDomain.BaseDirectory + fileName;
+                path = AppDomain.CurrentDomain.BaseDirectory +"\\log\\"+ fileName;
                 if (!Directory.Exists(path))
                 {
                     Directory.CreateDirectory(path);
                 }
-                path = path + "\\log\\" + DateTime.Now.ToString("yyyyMMdd") + ".txt";
+                path = path + "\\" + DateTime.Now.ToString("yyyyMMdd") + ".txt";
                 if (!File.Exists(path))
                 {
                     FileStream fs = File.Create(path);
