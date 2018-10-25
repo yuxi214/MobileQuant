@@ -34,16 +34,16 @@ namespace QuantEngine
         //事件
         public event OrderChanged OnChanged;
 
-        public Order(BaseStrategy strategy, string instrumentID, DirectionType direction, double price, DateTime orderTime, int volume, int volumeLeft, OrderStatus status)
+        public Order(BaseStrategy strategy, string instrumentID, DirectionType direction, double price,int volume)
         {
             this.mStrategy = strategy;
             this.mInstrumentID = instrumentID;
             this.mDirection = direction;
             this.mPrice = price;
-            this.mOrderTime = orderTime;
+            this.mOrderTime = DateTime.Now;
             this.mVolume = volume;
-            this.mVolumeLeft = volumeLeft;
-            this.mStatus = status;
+            this.mVolumeLeft = volume;
+            this.mStatus = OrderStatus.Normal;
         }
 
         public string InstrumentID
@@ -178,7 +178,7 @@ namespace QuantEngine
 
                 normal = normal && sOrder.Status == OrderStatus.Normal;
                 filled = filled && sOrder.Status == OrderStatus.Filled;
-                error = error && sOrder.Status == OrderStatus.Filled;
+                error = error && sOrder.Status == OrderStatus.Error;
                 cancled = cancled && sOrder.Status == OrderStatus.Canceled;
             }
 
@@ -206,10 +206,7 @@ namespace QuantEngine
 
             //订单状态变化
             mStrategy.UpdateOrder(this);
-            if(OnChanged != null)
-            {
-                OnChanged(this);
-            }
+            OnChanged(this);
         }
 
         public override string ToString()

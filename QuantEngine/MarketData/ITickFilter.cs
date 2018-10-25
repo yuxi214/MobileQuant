@@ -34,6 +34,7 @@ namespace QuantEngine
                 || tick.AveragePrice <= 0
                 || tick.OpenInterest <= 0)
             {
+                lastTick = tick;
                 return false;
             }
 
@@ -43,11 +44,13 @@ namespace QuantEngine
                 if (tick.LastPrice < lastTick.LastPrice * 0.9d 
                     || tick.LastPrice > lastTick.LastPrice * 1.1d)
                 {
+                    lastTick = tick;
                     return false;
                 }
             }
 
             //正常
+            lastTick = tick;
             return true;
         }
     }

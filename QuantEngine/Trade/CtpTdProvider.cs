@@ -48,9 +48,11 @@ namespace QuantEngine
             {
                 if(e.Value != 0)
                 {
-                    Thread.Sleep(1000 * 60);
-                    mTrader = new CTPTrade();
-                    mTrader.ReqConnect();
+                    new Thread(()=> {
+                        Thread.Sleep(1000 * 60);
+                        mTrader = new CTPTrade();
+                        Login(account);
+                    }).Start();
                 }
                 Utils.EnginLog("ctptd:OnRspUserLogin:" + e.Value);
             };
@@ -256,7 +258,7 @@ namespace QuantEngine
                 pType: OrderType.Limit,
                 pHedge: HedgeType.Speculation);
 
-            Utils.EnginLog($"发单：{rtn}|{subOrder.InstrumentID}|{subOrder.Direction}|{subOrder.Offset}|{subOrder.LimitPrice}|{subOrder.Volume}|{subOrder.CustomID}");
+            Utils.EnginLog($"发单：{rtn}\t{subOrder.InstrumentID}\t{subOrder.Direction}\t{subOrder.Offset}\t{subOrder.LimitPrice}\t{subOrder.Volume}\t{subOrder.CustomID}");
         }
         //撤销订单
         private void CancelOrder(SubOrder subOrder)
@@ -315,9 +317,8 @@ namespace QuantEngine
 
             //更新属性
             subOrder.OrderID = order.OrderID;
-            int tradeVol = order.TradeVolume - subOrder.VolumeTraded;
+            int beforeTraded = subOrder.VolumeTraded;
             subOrder.VolumeLeft = order.VolumeLeft;
-            subOrder.VolumeTraded = order.TradeVolume;
             switch (order.Status)
             {
                 case HaiFeng.OrderStatus.Canceled:
@@ -326,6 +327,7 @@ namespace QuantEngine
                     break;
                 case HaiFeng.OrderStatus.Filled:
                     subOrder.Status = OrderStatus.Filled;
+                    subOrder.VolumeTraded = subOrder.Volume;
                     activeOrders.Remove(subOrder);
                     break;
                 case HaiFeng.OrderStatus.Error:
@@ -336,12 +338,14 @@ namespace QuantEngine
                     subOrder.Status = OrderStatus.Normal;
                     break;
                 case HaiFeng.OrderStatus.Partial:
+                    subOrder.VolumeTraded = subOrder.Volume - subOrder.VolumeLeft;
                     subOrder.Status = OrderStatus.Partial;
                     break;
 
             }
 
             //发送事件
+            int tradeVol = subOrder.VolumeTraded - beforeTraded;
             if (tradeVol > 0)
             {
                 subOrder.EmitTrade(tradeVol);

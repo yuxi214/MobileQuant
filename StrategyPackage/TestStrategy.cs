@@ -19,7 +19,7 @@ namespace StrategyPackage
         {
             Console.WriteLine($"{DateTime.Now}-->{tick.InstrumentID}:{tick.LastPrice}");
             Random r = new Random();
-            int number = r.Next(1,1000);
+            int number = r.Next(1,100);
             if (count++ % number == 0)
             {
                 int pos = GetPosition(tick.InstrumentID);

@@ -150,7 +150,7 @@ namespace QuantEngine
             {
                 return BuyOrder(0, price, instrumentID);
             }
-            Order order = new Order(this, instrumentID, DirectionType.Buy, price, DateTime.Now, vol, vol, OrderStatus.Normal);
+            Order order = new Order(this, instrumentID, DirectionType.Buy, price, vol);
             return order;
         }
         public Order SellOrder(int vol)
@@ -177,7 +177,7 @@ namespace QuantEngine
             {
                 return SellOrder(0, price, instrumentID);
             }
-            Order order = new Order(this, instrumentID, DirectionType.Sell, price, DateTime.Now, vol, vol, OrderStatus.Normal);
+            Order order = new Order(this, instrumentID, DirectionType.Sell, price, vol);
             return order;
         }
         public Order ToPositionOrder(int position)
