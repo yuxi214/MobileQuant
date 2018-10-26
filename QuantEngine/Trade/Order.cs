@@ -34,7 +34,7 @@ namespace QuantEngine
         //事件
         public event OrderChanged OnChanged;
 
-        public Order(BaseStrategy strategy, string instrumentID, DirectionType direction, double price,int volume)
+        public Order(BaseStrategy strategy, string instrumentID, DirectionType direction, double price, int volume)
         {
             this.mStrategy = strategy;
             this.mInstrumentID = instrumentID;
@@ -123,30 +123,30 @@ namespace QuantEngine
                 foreach (SubOrder sOrder in mSubOrders)
                 {
                     sOrder.OnError += (SubOrder order) =>
-                    {
-                        refresh();
-                    };
+                   {
+                       refresh();
+                   };
                     sOrder.OnTraded += (int vol, SubOrder order) =>
-                    {
-                        if(order.Direction == DirectionType.Buy)
-                        {
-                            mStrategy.AddPosition(order.InstrumentID, vol);
-                        }
-                        else
-                        {
-                            mStrategy.AddPosition(order.InstrumentID, -vol);
-                        }
+                   {
+                       if (order.Direction == DirectionType.Buy)
+                       {
+                           mStrategy.AddPosition(order.InstrumentID, vol);
+                       }
+                       else
+                       {
+                           mStrategy.AddPosition(order.InstrumentID, -vol);
+                       }
 
-                        refresh();
-                    };
+                       refresh();
+                   };
                     sOrder.OnCanceled += (SubOrder order) =>
-                    {
-                        refresh();
-                    };
+                   {
+                       refresh();
+                   };
                     sOrder.OnCancelFailed += (SubOrder order) =>
-                    {
-                        refresh();
-                    };
+                   {
+                       refresh();
+                   };
                 }
             }
             get
@@ -158,7 +158,7 @@ namespace QuantEngine
         //刷新订单状态
         private void refresh()
         {
-            if (mSubOrders != null)
+            if (mSubOrders == null)
                 return;
 
             int left = 0;
@@ -189,13 +189,16 @@ namespace QuantEngine
             if (normal)
             {
                 mStatus = OrderStatus.Normal;
-            }else if (filled)
+            }
+            else if (filled)
             {
                 mStatus = OrderStatus.Filled;
-            }else if (error)
+            }
+            else if (error)
             {
                 mStatus = OrderStatus.Error;
-            }else if (cancled)
+            }
+            else if (cancled)
             {
                 mStatus = OrderStatus.Canceled;
             }
@@ -206,7 +209,7 @@ namespace QuantEngine
 
             //订单状态变化
             mStrategy.UpdateOrder(this);
-            OnChanged(this);
+            OnChanged?.Invoke(this);
         }
 
         public override string ToString()
@@ -290,35 +293,19 @@ namespace QuantEngine
 
         internal void EmitTrade(int vol)
         {
-            if(OnTraded != null)
-            {
-                OnTraded(vol, this);
-            }
-
+            OnTraded?.Invoke(vol, this);
         }
         internal void EmitError()
         {
-            if(OnError != null)
-            {
-                OnError(this);
-            }
-
+            OnError?.Invoke(this);
         }
         internal void EmitCancel()
         {
-            if(OnCanceled != null)
-            {
-                OnCanceled(this);
-            }
-
+            OnCanceled?.Invoke(this);
         }
         internal void EmitCancelFailed()
         {
-            if(OnCancelFailed != null)
-            {
-                OnCancelFailed(this);
-            }
-
+            OnCancelFailed?.Invoke(this);
         }
 
         public string OrderID

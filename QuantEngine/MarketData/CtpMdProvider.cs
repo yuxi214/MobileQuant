@@ -82,7 +82,7 @@ namespace QuantEngine
                     , _md.AveragePrice, _md.Volume, _md.OpenInterest, _time, _md.UpperLimitPrice, _md.LowerLimitPrice);
 
                 //发送
-                OnTick(_tick);
+                OnTick?.Invoke(_tick);
             };
             mQuoter.OnRtnError += (object sender, ErrorEventArgs e) =>
             {

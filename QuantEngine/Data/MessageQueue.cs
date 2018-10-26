@@ -56,7 +56,7 @@ namespace QuantEngine
         private void execute()
         {
             Message m = queue.Take();
-                OnMessage(m);
+                OnMessage?.Invoke(m);
         }
     }
 

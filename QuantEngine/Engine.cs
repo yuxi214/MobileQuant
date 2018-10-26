@@ -44,7 +44,7 @@ namespace QuantEngine
 
             //启动行情接口
             mMp.Login(mac);
-            mMp.OnTick += new RtnTick(_RtnTick);
+            mMp.OnTick += _RtnTick;
             foreach(string instrumentID in mStgManager.GetInstrumentIDs())
             {
                 mMp.SubscribeMarketData(instrumentID);
