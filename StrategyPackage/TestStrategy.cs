@@ -14,12 +14,13 @@ namespace StrategyPackage
         {
             return new string[] { "ru1901", "TA901", "y1901" };
         }
-        long count = 0;
+        long count = 1;
+        List<Order> orders = new List<Order>();
         public override void OnTick(Tick tick)
         {
-            Console.WriteLine($"{DateTime.Now}-->{tick.InstrumentID}:{tick.LastPrice}");
+            Console.WriteLine($"{DateTime.Now}-->{tick.InstrumentID}:{tick.LastPrice}-----{count}");
             Random r = new Random();
-            int number = r.Next(1,1000);
+            int number = r.Next(1,100);
             if (count++ % number == 0)
             {
                 int pos = GetPosition(tick.InstrumentID);
@@ -44,6 +45,19 @@ namespace StrategyPackage
                     }
                 };
                 order.Send();
+                orders.Add(order);
+            }
+
+            //撤单
+            foreach(Order o in orders)
+            {
+                if(o.Status == OrderStatus.Normal || o.Status == OrderStatus.Partial)
+                {
+                    if(o.OrderTime.AddMinutes(1) < DateTime.Now)
+                    {
+                        o.Cancle();
+                    }
+                }
             }
         }
     }

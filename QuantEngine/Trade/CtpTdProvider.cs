@@ -11,8 +11,9 @@ namespace QuantEngine
 {
     internal class CtpTdProvider : ITdProvider
     {
+        private Timer mTimer;
         private Account mAccount;
-        private CTPTrade mTrader = new CTPTrade();
+        private CTPTrade mTrader;
 
         private int customID = 1; //自增编码，用来定位订单回报
         Dictionary<int, SubOrder> orderMap = new Dictionary<int, SubOrder>(); //订单
@@ -27,20 +28,45 @@ namespace QuantEngine
                 return instance;
             }
         }
-        private CtpTdProvider() { }
+        private CtpTdProvider() {
+            mTimer = new Timer(check, null, 1000 * 600, 1000 * 60);
+        }
+
+        //定时检查
+        private void check(object o)
+        {
+            long now = DateTime.Now.Hour * 100 + DateTime.Now.Minute;
+
+            if (now > 231 && now < 845)
+                return;
+            if (now > 1516 && now < 2045)
+                return;
+            if (mTrader != null && mTrader.IsLogin)
+                return;
+            if (mAccount == null)
+                return;
+
+            //自动登陆
+            Login(mAccount);
+        }
 
         //登陆
         public void Login(Account account)
         {
-            if (account != null && mTrader.IsLogin)
+            if (account == null)
+                return;
+            mAccount = account;
+
+            if (mTrader != null && mTrader.IsLogin)
                 return;
 
-            mAccount = account;
+            //初始化
+            mTrader = new CTPTrade();
 
             //连接
             mTrader.OnFrontConnected += (object sender, EventArgs e) =>
             {
-                mTrader.ReqUserLogin(account.Investor, account.Password, account.Broker);
+                mTrader.ReqUserLogin(mAccount.Investor, mAccount.Password, mAccount.Broker);
                 Utils.EnginLog("ctptd:OnFrontConnected");
             };
             //登入
@@ -49,9 +75,7 @@ namespace QuantEngine
                 if(e.Value != 0)
                 {
                     Logout();
-                    Thread.Sleep(1000);
-                    mTrader = new CTPTrade();
-                    Login(mAccount);
+                    mTrader = null;
                 }
                 Utils.EnginLog("ctptd:OnRspUserLogin:" + e.Value);
             };
@@ -216,6 +240,8 @@ namespace QuantEngine
         //撤销订单
         public void CancelOrder(Order order)
         {
+            if (order.SubOrders == null)
+                return;
             foreach (SubOrder subOrder in order.SubOrders)
             {
                 if (subOrder.OrderID.Equals(string.Empty))
