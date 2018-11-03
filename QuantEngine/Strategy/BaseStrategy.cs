@@ -221,6 +221,9 @@ namespace QuantEngine
     //其他
     public partial class BaseStrategy
     {
+        //全局锁
+        public static int Locker;
+        //些日志
         public void Log(string content)
         {
             Utils.UserLog(content);

@@ -54,36 +54,8 @@ namespace QuantEngine
                 Utils.EnginLog("ctpmd:OnRspUserLogout");
             };
             //行情回调
-            mQuoter.OnRtnTick += (object sender, TickEventArgs e) =>
-            {
-                MarketData _md = e.Tick;
-
-                //处理时间
-                DateTime _time = DateTime.Now;
-                try
-                {
-                    _time = DateTime.ParseExact(_md.UpdateTime, "HH:mm:ss", System.Globalization.CultureInfo.CurrentCulture);
-                    if((_time-DateTime.Now).TotalHours > 23)
-                    {
-                        _time.AddDays(-1);
-                    }else if((_time - DateTime.Now).TotalHours < -23)
-                    {
-                        _time.AddDays(1);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Utils.EnginLog(ex.StackTrace);
-                }
-                _time.AddMilliseconds(_md.UpdateMillisec);
-
-
-                Tick _tick = new Tick(_md.InstrumentID, _md.LastPrice, _md.BidPrice, _md.BidVolume, _md.AskPrice, _md.AskVolume
-                    , _md.AveragePrice, _md.Volume, _md.OpenInterest, _time, _md.UpperLimitPrice, _md.LowerLimitPrice);
-
-                //发送
-                OnTick?.Invoke(_tick);
-            };
+            mQuoter.OnRtnTick += _onTick;
+            //错误回调
             mQuoter.OnRtnError += (object sender, ErrorEventArgs e) =>
             {
                 Utils.EnginLog("OnRtnError：" + e.ErrorMsg);
@@ -103,6 +75,42 @@ namespace QuantEngine
         {
             return mQuoter.IsLogin;
         }
+
+        //处理行情
+        private void _onTick(object sender, TickEventArgs e)
+        {
+            MarketData _md = e.Tick;
+
+            //处理时间
+            DateTime _time = DateTime.Now;
+            try
+            {
+                _time = DateTime.ParseExact(_md.UpdateTime, "HH:mm:ss", System.Globalization.CultureInfo.CurrentCulture);
+                if ((_time - DateTime.Now).TotalHours > 23)
+                {
+                    _time.AddDays(-1);
+                }
+                else if ((_time - DateTime.Now).TotalHours < -23)
+                {
+                    _time.AddDays(1);
+                }
+            }
+            catch (Exception ex)
+            {
+                Utils.EnginLog(ex.StackTrace);
+            }
+            _time.AddMilliseconds(_md.UpdateMillisec);
+
+
+            Tick _tick = new Tick(_md.InstrumentID, _md.LastPrice, _md.BidPrice, _md.BidVolume, _md.AskPrice, _md.AskVolume
+                , _md.AveragePrice, _md.Volume, _md.OpenInterest, _time, _md.UpperLimitPrice, _md.LowerLimitPrice);
+
+            //发送
+            while (0 != Interlocked.Exchange(ref BaseStrategy.Locker, 1)) { }
+            OnTick?.Invoke(_tick);
+            Interlocked.Exchange(ref BaseStrategy.Locker, 0);
+        }
+
         //订阅行情
         private Dictionary<string, bool> mSubscribeMap = new Dictionary<string, bool>();
         public void SubscribeMarketData(string instrumentID)
@@ -126,6 +134,7 @@ namespace QuantEngine
                 mSubscribeMap[instrumentID] = false;
             }
         }
+
         //退订行情
         public void UnSubscribeMarketData(string instrumentID)
         {

@@ -29,7 +29,7 @@ namespace QuantEngine
         //状态
         private OrderStatus mStatus = OrderStatus.Normal;
         //子订单
-        private List<SubOrder> mSubOrders;
+        private List<SubOrder> mSubOrders = new List<SubOrder>();
 
         //事件
         public event OrderChanged OnChanged;
@@ -46,6 +46,7 @@ namespace QuantEngine
             this.mStatus = OrderStatus.Normal;
         }
 
+        //
         public string InstrumentID
         {
             get
@@ -112,51 +113,18 @@ namespace QuantEngine
 
         internal List<SubOrder> SubOrders
         {
-            set
-            {
-                if (mSubOrders != null)
-                    return;
-
-                mSubOrders = value;
-                if (mSubOrders == null)
-                    return;
-                foreach (SubOrder sOrder in mSubOrders)
-                {
-                    sOrder.OnError += (SubOrder order) =>
-                   {
-                       refresh();
-                   };
-                    sOrder.OnTraded += (int vol, SubOrder order) =>
-                   {
-                       if (order.Direction == DirectionType.Buy)
-                       {
-                           mStrategy.AddPosition(order.InstrumentID, vol);
-                       }
-                       else
-                       {
-                           mStrategy.AddPosition(order.InstrumentID, -vol);
-                       }
-
-                       refresh();
-                   };
-                    sOrder.OnCanceled += (SubOrder order) =>
-                   {
-                       refresh();
-                   };
-                    sOrder.OnCancelFailed += (SubOrder order) =>
-                   {
-                       refresh();
-                   };
-                }
-            }
             get
             {
                 return mSubOrders;
             }
         }
 
-        //刷新订单状态
-        private void refresh()
+        //
+        internal void AddSubOrder(SubOrder o)
+        {
+            mSubOrders.Add(o);
+        }
+        internal void RefreshSubOrders()
         {
             if (mSubOrders == null)
                 return;
@@ -212,11 +180,6 @@ namespace QuantEngine
             OnChanged?.Invoke(this);
         }
 
-        public override string ToString()
-        {
-            return $"{mInstrumentID},{mDirection},{mPrice},{mVolume},{mVolumeLeft},{Status}";
-        }
-
         //发送订单
         public void Send()
         {
@@ -229,11 +192,6 @@ namespace QuantEngine
         }
     }
 
-    //子订单委托
-    internal delegate void SubOrderError(SubOrder sOrder);
-    internal delegate void SubOrderTrade(int vol, SubOrder sOrder);
-    internal delegate void SubOrderCancelFailed(SubOrder sOrder);
-    internal delegate void SubOrderCanceled(SubOrder sOrder);
     internal class SubOrder
     {
         //合并订单
@@ -285,27 +243,9 @@ namespace QuantEngine
             this.status = status;
         }
 
-        //事件
-        internal event SubOrderError OnError;
-        internal event SubOrderTrade OnTraded;
-        internal event SubOrderCanceled OnCanceled;
-        internal event SubOrderCancelFailed OnCancelFailed;
-
-        internal void EmitTrade(int vol)
+        internal void Refresh()
         {
-            OnTraded?.Invoke(vol, this);
-        }
-        internal void EmitError()
-        {
-            OnError?.Invoke(this);
-        }
-        internal void EmitCancel()
-        {
-            OnCanceled?.Invoke(this);
-        }
-        internal void EmitCancelFailed()
-        {
-            OnCancelFailed?.Invoke(this);
+            pOrder.RefreshSubOrders();
         }
 
         public string OrderID
@@ -403,14 +343,6 @@ namespace QuantEngine
             set
             {
                 status = value;
-            }
-        }
-
-        public Order POrder
-        {
-            get
-            {
-                return pOrder;
             }
         }
 

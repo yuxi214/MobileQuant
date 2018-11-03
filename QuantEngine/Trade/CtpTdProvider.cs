@@ -28,7 +28,8 @@ namespace QuantEngine
                 return instance;
             }
         }
-        private CtpTdProvider() {
+        private CtpTdProvider()
+        {
             mTimer = new Timer(check, null, 1000 * 600, 1000 * 60);
         }
 
@@ -37,6 +38,7 @@ namespace QuantEngine
         {
             long now = DateTime.Now.Hour * 100 + DateTime.Now.Minute;
 
+            //
             if (now > 231 && now < 845)
                 return;
             if (now > 1516 && now < 2045)
@@ -72,7 +74,7 @@ namespace QuantEngine
             //登入
             mTrader.OnRspUserLogin += (object sender, IntEventArgs e) =>
             {
-                if(e.Value != 0)
+                if (e.Value != 0)
                 {
                     Logout();
                     mTrader = null;
@@ -128,8 +130,6 @@ namespace QuantEngine
         //生成子订单
         private void createSubOrder(Order order)
         {
-            List<SubOrder> subOrderList = new List<SubOrder>();
-
             PositionField position;
             if (mTrader.DicPositionField.TryGetValue(order.InstrumentID + "_" + (order.Direction == DirectionType.Buy ? "Sell" : "Buy"), out position))
             {
@@ -152,7 +152,6 @@ namespace QuantEngine
                 //先平今
                 if (volLeft <= 0)
                 {
-                    order.SubOrders = subOrderList;
                     return;
                 }
                 int posLeft = position.TdPosition > frozenTd ? position.TdPosition - frozenTd : 0;
@@ -170,13 +169,12 @@ namespace QuantEngine
                     volumeLeft: vol,
                     status: OrderStatus.Normal);
 
-                    subOrderList.Add(subOrder);
+                    order.AddSubOrder(subOrder);
                 }
 
                 //后平仓
                 if (volLeft <= 0)
                 {
-                    order.SubOrders = subOrderList;
                     return;
                 }
                 posLeft = position.YdPosition > frozenYd ? position.YdPosition - frozenYd : 0;
@@ -194,13 +192,12 @@ namespace QuantEngine
                     volumeLeft: vol,
                     status: OrderStatus.Normal);
 
-                    subOrderList.Add(subOrder);
+                    order.AddSubOrder(subOrder);
                 }
 
                 //再开仓
                 if (volLeft <= 0)
                 {
-                    order.SubOrders = subOrderList;
                     return;
                 }
                 vol = volLeft;
@@ -216,7 +213,7 @@ namespace QuantEngine
                     volumeLeft: vol,
                     status: OrderStatus.Normal);
 
-                    subOrderList.Add(subOrder);
+                    order.AddSubOrder(subOrder);
                 }
             }
             else
@@ -231,11 +228,9 @@ namespace QuantEngine
                 volumeLeft: order.Volume,
                 status: OrderStatus.Normal);
 
-                subOrderList.Add(subOrder);
+                order.AddSubOrder(subOrder);
 
             }
-
-            order.SubOrders = subOrderList;
         }
         //撤销订单
         public void CancelOrder(Order order)
@@ -304,6 +299,7 @@ namespace QuantEngine
         //撤单回报
         private void _OnRtnCancel(object sender, OrderArgs e)
         {
+            while (0 != Interlocked.Exchange(ref BaseStrategy.Locker, 1)) { }
             OrderField order = e.Value;
             SubOrder subOrder;
             if (!orderMap.TryGetValue(order.Custom, out subOrder))
@@ -311,12 +307,14 @@ namespace QuantEngine
                 Utils.EnginLog($"撤单回报|未找到对应本地单：{order.Custom}\t{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}");
                 return;
             }
-            subOrder.EmitCancel();
+            syncOrder(order, subOrder);
             Utils.EnginLog($"撤单回报：{order.Custom}\t{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}");
+            Interlocked.Exchange(ref BaseStrategy.Locker, 0);
         }
         //撤单错误
         private void _OnRtnErrCancel(object sender, ErrOrderArgs e)
         {
+            while (0 != Interlocked.Exchange(ref BaseStrategy.Locker, 1)) { }
             OrderField order = e.Value;
             SubOrder subOrder;
             if (!orderMap.TryGetValue(order.Custom, out subOrder))
@@ -324,19 +322,23 @@ namespace QuantEngine
                 Utils.EnginLog($"撤单错误回报|未找到对应本地单：{order.Custom}\t{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}\t{e.ErrorID}\t{e.ErrorMsg}");
                 return;
             }
-            subOrder.EmitCancelFailed();
-            Utils.EnginLog($"撤单错误回报：{order.Custom}\t{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}\t{e.ErrorID}\t{e.ErrorMsg}");
+            syncOrder(order, subOrder);
 
+            Utils.EnginLog($"撤单错误回报：{order.Custom}\t{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}\t{e.ErrorID}\t{e.ErrorMsg}");
+            Interlocked.Exchange(ref BaseStrategy.Locker, 0);
         }
         //交易回报
         private void _OnRtnTrade(object sender, TradeArgs e)
         {
+            while (0 != Interlocked.Exchange(ref BaseStrategy.Locker, 1)) { }
             TradeField trade = e.Value;
             Utils.EnginLog($"交易回报：{trade.OrderID}\t{trade.InstrumentID}\t{trade.Direction}\t{trade.Offset}\t{trade.Price}\t{trade.Volume}");
+            Interlocked.Exchange(ref BaseStrategy.Locker, 0);
         }
         //订单回报
         private void _OnRtnOrder(object sender, OrderArgs e)
         {
+            while (0 != Interlocked.Exchange(ref BaseStrategy.Locker, 1)) { }
             OrderField order = e.Value;
             SubOrder subOrder;
             if (!orderMap.TryGetValue(order.Custom, out subOrder))
@@ -344,48 +346,14 @@ namespace QuantEngine
                 Utils.EnginLog($"订单回报|未找到对应本地单：{order.Custom}\t{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}");
                 return;
             }
-
-            //更新属性
-            subOrder.OrderID = order.OrderID;
-            int beforeTraded = subOrder.VolumeTraded;
-            subOrder.VolumeLeft = order.VolumeLeft;
-            switch (order.Status)
-            {
-                case HaiFeng.OrderStatus.Canceled:
-                    subOrder.Status = OrderStatus.Canceled;
-                    activeOrders.Remove(subOrder);
-                    break;
-                case HaiFeng.OrderStatus.Filled:
-                    subOrder.Status = OrderStatus.Filled;
-                    subOrder.VolumeTraded = subOrder.Volume;
-                    activeOrders.Remove(subOrder);
-                    break;
-                case HaiFeng.OrderStatus.Error:
-                    subOrder.Status = OrderStatus.Error;
-                    activeOrders.Remove(subOrder);
-                    break;
-                case HaiFeng.OrderStatus.Normal:
-                    subOrder.Status = OrderStatus.Normal;
-                    break;
-                case HaiFeng.OrderStatus.Partial:
-                    subOrder.VolumeTraded = subOrder.Volume - subOrder.VolumeLeft;
-                    subOrder.Status = OrderStatus.Partial;
-                    break;
-
-            }
-
-            //发送事件
-            int tradeVol = subOrder.VolumeTraded - beforeTraded;
-            if (tradeVol > 0)
-            {
-                subOrder.EmitTrade(tradeVol);
-            }
-
+            syncOrder(order, subOrder);
             Utils.EnginLog($"订单回报：{order.Custom}\t{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}");
+            Interlocked.Exchange(ref BaseStrategy.Locker, 0);
         }
         //报单错误回报
         private void _OnRtnErrOrder(object sender, ErrOrderArgs e)
         {
+            while (0 != Interlocked.Exchange(ref BaseStrategy.Locker, 1)) { }
             OrderField order = e.Value;
             SubOrder subOrder;
             if (!orderMap.TryGetValue(order.Custom, out subOrder))
@@ -394,8 +362,44 @@ namespace QuantEngine
                 return;
             }
             activeOrders.Remove(subOrder);
-            subOrder.EmitError();
+            syncOrder(order, subOrder);
             Utils.EnginLog($"报单错误回报：{order.Custom}\t{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}\t{e.ErrorID}\t{e.ErrorMsg}");
+            Interlocked.Exchange(ref BaseStrategy.Locker, 0);
+        }
+        //同步订单
+        private void syncOrder(OrderField o, SubOrder s)
+        {
+            //更新编号
+            s.OrderID = o.OrderID;
+            //只有正常和部成，才响应订单事件
+            if (s.Status == OrderStatus.Normal || s.Status == OrderStatus.Partial)
+            {
+                switch (o.Status)
+                {
+                    case HaiFeng.OrderStatus.Canceled:
+                        s.VolumeLeft = 0;
+                        s.Status = OrderStatus.Canceled;
+                        activeOrders.Remove(s);
+                        break;
+                    case HaiFeng.OrderStatus.Filled:
+                        s.VolumeLeft = 0;
+                        s.Status = OrderStatus.Filled;
+                        s.VolumeTraded = s.Volume;
+                        activeOrders.Remove(s);
+                        break;
+                    case HaiFeng.OrderStatus.Error:
+                        s.VolumeLeft = 0;
+                        s.Status = OrderStatus.Error;
+                        activeOrders.Remove(s);
+                        break;
+                    case HaiFeng.OrderStatus.Partial:
+                        s.VolumeLeft = o.VolumeLeft;
+                        s.VolumeTraded = s.Volume - s.VolumeLeft;
+                        s.Status = OrderStatus.Partial;
+                        break;
+                }
+            }
+            s.Refresh();
 
         }
     }
