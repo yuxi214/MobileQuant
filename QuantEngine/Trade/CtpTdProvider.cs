@@ -305,6 +305,7 @@ namespace QuantEngine
             if (!orderMap.TryGetValue(order.Custom, out subOrder))
             {
                 Utils.EnginLog($"撤单回报|未找到对应本地单：{order.Custom}\t{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}");
+                Interlocked.Exchange(ref BaseStrategy.Locker, 0);
                 return;
             }
             syncOrder(order, subOrder);
@@ -320,6 +321,7 @@ namespace QuantEngine
             if (!orderMap.TryGetValue(order.Custom, out subOrder))
             {
                 Utils.EnginLog($"撤单错误回报|未找到对应本地单：{order.Custom}\t{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}\t{e.ErrorID}\t{e.ErrorMsg}");
+                Interlocked.Exchange(ref BaseStrategy.Locker, 0);
                 return;
             }
             syncOrder(order, subOrder);
@@ -344,6 +346,7 @@ namespace QuantEngine
             if (!orderMap.TryGetValue(order.Custom, out subOrder))
             {
                 Utils.EnginLog($"订单回报|未找到对应本地单：{order.Custom}\t{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}");
+                Interlocked.Exchange(ref BaseStrategy.Locker, 0);
                 return;
             }
             syncOrder(order, subOrder);
@@ -359,6 +362,7 @@ namespace QuantEngine
             if (!orderMap.TryGetValue(order.Custom, out subOrder))
             {
                 Utils.EnginLog($"报单错误回报|未找到对应本地单：{order.Custom}\t{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}\t{e.ErrorID}\t{e.ErrorMsg}");
+                Interlocked.Exchange(ref BaseStrategy.Locker, 0);
                 return;
             }
             activeOrders.Remove(subOrder);

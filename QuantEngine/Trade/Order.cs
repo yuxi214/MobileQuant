@@ -129,8 +129,9 @@ namespace QuantEngine
             if (mSubOrders == null)
                 return;
 
-            int left = 0;
-            int traded = 0;
+            int left = 0; //未成
+            int traded = 0; //已成
+            int currentTrade = 0; //当前成交
 
             bool normal = true;
             bool partial = true;
@@ -151,7 +152,21 @@ namespace QuantEngine
             }
 
             mVolumeLeft = left;
+            currentTrade = traded - mVolumeTraded;
             mVolumeTraded = traded;
+
+            //策略持仓调整
+            if (currentTrade > 0)
+            {
+                if (mDirection == DirectionType.Buy)
+                {
+                    mStrategy.AddPosition(mInstrumentID, currentTrade);
+                }
+                else
+                {
+                    mStrategy.AddPosition(mInstrumentID, -currentTrade);
+                }
+            }
 
             //状态
             if (normal)

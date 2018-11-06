@@ -70,6 +70,10 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="ZeroMQ, Version=4.1.0.25, Culture=neutral, PublicKeyToken=4a9630883fd6c563, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZeroMQ.4.1.0.26\lib\net40\ZeroMQ.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\Config.cs" />
@@ -77,6 +81,7 @@
     <Compile Include="Data\MessageQueue.cs" />
     <Compile Include="Data\SqliteHelper.cs" />
     <Compile Include="MarketData\CtpMdProvider.cs" />
+    <Compile Include="Message\MessageType.cs" />
     <Compile Include="Trade\CtpTdProvider.cs" />
     <Compile Include="MarketData\IMdProvider.cs" />
     <Compile Include="Trade\ITdProvider.cs" />
@@ -104,7 +109,9 @@
       <ErrorText>这台计算机上缺少此项目引用的 NuGet 程序包。使用“NuGet 程序包还原”可下载这些程序包。有关更多信息，请参见 http://go.microsoft.com/fwlink/?LinkID=322105。缺少的文件是 {0}。</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.109.2\build\net451\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.109.2\build\net451\System.Data.SQLite.Core.targets'))" />
+    <Error Condition="!Exists('..\packages\ZeroMQ.4.1.0.26\build\net40\ZeroMQ.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\ZeroMQ.4.1.0.26\build\net40\ZeroMQ.targets'))" />
   </Target>
+  <Import Project="..\packages\ZeroMQ.4.1.0.26\build\net40\ZeroMQ.targets" Condition="Exists('..\packages\ZeroMQ.4.1.0.26\build\net40\ZeroMQ.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
