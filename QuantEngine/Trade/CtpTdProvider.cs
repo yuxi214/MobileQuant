@@ -246,6 +246,15 @@ namespace QuantEngine
                 }
                 int rtn;
                 rtn = mTrader.ReqOrderAction(subOrder.OrderID);
+
+                //这种情况多是盘后未撤订单，按撤单处理
+                if(rtn == -1)
+                {
+                    subOrder.Status = OrderStatus.Canceled;
+                    subOrder.VolumeLeft = 0;
+                    subOrder.Refresh();
+                }
+
                 Utils.EnginLog($"撤单：{rtn}|{subOrder.InstrumentID}|{subOrder.Direction}|{subOrder.Offset}|{subOrder.LimitPrice}|{subOrder.Volume}|{subOrder.CustomID}|{subOrder.OrderID}");
             }
         }

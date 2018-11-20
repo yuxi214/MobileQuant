@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuantEngine", "QuantEngine\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StrategyPackage", "StrategyPackage\StrategyPackage.csproj", "{4F3077BC-076C-4CD4-BA8B-23E5A242B82E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StrategyTools", "StrategyTools\StrategyTools.csproj", "{7624F5AF-7387-4888-8AD6-63547A2E72D2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{4F3077BC-076C-4CD4-BA8B-23E5A242B82E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F3077BC-076C-4CD4-BA8B-23E5A242B82E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4F3077BC-076C-4CD4-BA8B-23E5A242B82E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7624F5AF-7387-4888-8AD6-63547A2E72D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7624F5AF-7387-4888-8AD6-63547A2E72D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7624F5AF-7387-4888-8AD6-63547A2E72D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7624F5AF-7387-4888-8AD6-63547A2E72D2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
