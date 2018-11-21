@@ -15,7 +15,7 @@ namespace QuantEngine
         //创建数据库文件
         public static void CreateDBFile(string fileName)
         {
-            string path = System.Environment.CurrentDirectory + @"/Data/";
+            string path = System.Environment.CurrentDirectory + @"/data/";
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
@@ -31,7 +31,7 @@ namespace QuantEngine
         private static string CreateConnectionString()
         {
             SQLiteConnectionStringBuilder connectionString = new SQLiteConnectionStringBuilder();
-            connectionString.DataSource = @"./Data/QuantData.db";
+            connectionString.DataSource = @"./data/QuantData.db";
 
             string conStr = connectionString.ToString();
             return conStr;

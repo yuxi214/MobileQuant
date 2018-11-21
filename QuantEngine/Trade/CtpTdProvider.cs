@@ -252,6 +252,7 @@ namespace QuantEngine
                 {
                     subOrder.Status = OrderStatus.Canceled;
                     subOrder.VolumeLeft = 0;
+                    activeOrders.Remove(subOrder);
                     subOrder.Refresh();
                 }
 

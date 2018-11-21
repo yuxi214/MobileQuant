@@ -54,11 +54,15 @@ namespace QuantEngine
         }
         private void savePosition(Position p)
         {
-            string sql = $@"replace into [t_position]
+            string sql = @"replace into [t_position]
                             ([strategy_name], [instrument_id], [position], [last_time]) 
                             values
-                            ('{p.StrategyName}','{p.InstrumentID}',{p.Vol},'{p.LastTime}')";
-            SQLiteHelper.ExecuteNonQuery(sql);
+                            (@strategyName,@instrumentID,@vol,@lastTime)";
+            SQLiteHelper.ExecuteNonQuery(sql
+                , new System.Data.SQLite.SQLiteParameter("strategyName", p.StrategyName)
+                , new System.Data.SQLite.SQLiteParameter("instrumentID",p.InstrumentID)
+                , new System.Data.SQLite.SQLiteParameter("vol",p.Vol)
+                , new System.Data.SQLite.SQLiteParameter("lastTime",p.LastTime));
         }
 
         //订单
@@ -72,8 +76,15 @@ namespace QuantEngine
             string sql = $@"insert into [t_order]
                             ([strategy_name], [instrument_id], [direction], [price], [volume], [volume_traded], [order_time])
                             values
-                            ('{o.Strategy.GetType().Name}','{o.InstrumentID}','{direction}',{o.Price},{o.Volume},{o.Volume-o.VolumeLeft},'{o.OrderTime}')";
-            SQLiteHelper.ExecuteNonQuery(sql);
+                            (@strategyName,@instrumentID,@direction,@price,@volume,@olumeTraded,@orderTime)";
+            SQLiteHelper.ExecuteNonQuery(sql
+                , new System.Data.SQLite.SQLiteParameter("strategyName", o.Strategy.GetType().Name)
+                , new System.Data.SQLite.SQLiteParameter("instrumentID", o.InstrumentID)
+                , new System.Data.SQLite.SQLiteParameter("direction", direction)
+                , new System.Data.SQLite.SQLiteParameter("price", o.Price)
+                , new System.Data.SQLite.SQLiteParameter("volume", o.Volume)
+                , new System.Data.SQLite.SQLiteParameter("olumeTraded", o.Volume - o.VolumeLeft)
+                , new System.Data.SQLite.SQLiteParameter("orderTime", o.OrderTime));
         }
     }
 }
