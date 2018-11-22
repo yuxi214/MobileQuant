@@ -33,10 +33,10 @@
             this.dataGridViewStrategy = new System.Windows.Forms.DataGridView();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPagePosition = new System.Windows.Forms.TabPage();
-            this.tabPageOrder = new System.Windows.Forms.TabPage();
             this.dataGridViewPosition = new System.Windows.Forms.DataGridView();
-            this.dataGridViewOrder = new System.Windows.Forms.DataGridView();
+            this.tabPageOrder = new System.Windows.Forms.TabPage();
             this.buttonExport = new System.Windows.Forms.Button();
+            this.dataGridViewOrder = new System.Windows.Forms.DataGridView();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMain)).BeginInit();
             this.splitContainerMain.Panel1.SuspendLayout();
             this.splitContainerMain.Panel2.SuspendLayout();
@@ -44,8 +44,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewStrategy)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.tabPagePosition.SuspendLayout();
-            this.tabPageOrder.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewPosition)).BeginInit();
+            this.tabPageOrder.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewOrder)).BeginInit();
             this.SuspendLayout();
             // 
@@ -65,8 +65,8 @@
             // splitContainerMain.Panel2
             // 
             this.splitContainerMain.Panel2.Controls.Add(this.tabControl1);
-            this.splitContainerMain.Size = new System.Drawing.Size(915, 749);
-            this.splitContainerMain.SplitterDistance = 261;
+            this.splitContainerMain.Size = new System.Drawing.Size(884, 561);
+            this.splitContainerMain.SplitterDistance = 225;
             this.splitContainerMain.SplitterWidth = 5;
             this.splitContainerMain.TabIndex = 0;
             // 
@@ -74,7 +74,7 @@
             // 
             this.buttonStartStrategy.BackColor = System.Drawing.SystemColors.MenuHighlight;
             this.buttonStartStrategy.ForeColor = System.Drawing.Color.Crimson;
-            this.buttonStartStrategy.Location = new System.Drawing.Point(90, 12);
+            this.buttonStartStrategy.Location = new System.Drawing.Point(74, 12);
             this.buttonStartStrategy.Name = "buttonStartStrategy";
             this.buttonStartStrategy.Size = new System.Drawing.Size(93, 45);
             this.buttonStartStrategy.TabIndex = 1;
@@ -86,14 +86,19 @@
             this.dataGridViewStrategy.AllowUserToAddRows = false;
             this.dataGridViewStrategy.AllowUserToDeleteRows = false;
             this.dataGridViewStrategy.AllowUserToOrderColumns = true;
+            this.dataGridViewStrategy.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
+            this.dataGridViewStrategy.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
             this.dataGridViewStrategy.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridViewStrategy.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.dataGridViewStrategy.Location = new System.Drawing.Point(0, 77);
+            this.dataGridViewStrategy.MultiSelect = false;
             this.dataGridViewStrategy.Name = "dataGridViewStrategy";
             this.dataGridViewStrategy.ReadOnly = true;
             this.dataGridViewStrategy.RowTemplate.Height = 23;
-            this.dataGridViewStrategy.Size = new System.Drawing.Size(261, 672);
+            this.dataGridViewStrategy.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dataGridViewStrategy.Size = new System.Drawing.Size(225, 484);
             this.dataGridViewStrategy.TabIndex = 0;
+            this.dataGridViewStrategy.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewStrategy_CellClick);
             // 
             // tabControl1
             // 
@@ -104,7 +109,7 @@
             this.tabControl1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(649, 749);
+            this.tabControl1.Size = new System.Drawing.Size(654, 561);
             this.tabControl1.TabIndex = 0;
             // 
             // tabPagePosition
@@ -114,10 +119,26 @@
             this.tabPagePosition.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.tabPagePosition.Name = "tabPagePosition";
             this.tabPagePosition.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.tabPagePosition.Size = new System.Drawing.Size(641, 719);
+            this.tabPagePosition.Size = new System.Drawing.Size(709, 699);
             this.tabPagePosition.TabIndex = 0;
             this.tabPagePosition.Text = "持仓";
             this.tabPagePosition.UseVisualStyleBackColor = true;
+            // 
+            // dataGridViewPosition
+            // 
+            this.dataGridViewPosition.AllowUserToAddRows = false;
+            this.dataGridViewPosition.AllowUserToDeleteRows = false;
+            this.dataGridViewPosition.AllowUserToOrderColumns = true;
+            this.dataGridViewPosition.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
+            this.dataGridViewPosition.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
+            this.dataGridViewPosition.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridViewPosition.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridViewPosition.Location = new System.Drawing.Point(3, 4);
+            this.dataGridViewPosition.Name = "dataGridViewPosition";
+            this.dataGridViewPosition.ReadOnly = true;
+            this.dataGridViewPosition.RowTemplate.Height = 23;
+            this.dataGridViewPosition.Size = new System.Drawing.Size(703, 691);
+            this.dataGridViewPosition.TabIndex = 0;
             // 
             // tabPageOrder
             // 
@@ -127,38 +148,10 @@
             this.tabPageOrder.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.tabPageOrder.Name = "tabPageOrder";
             this.tabPageOrder.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.tabPageOrder.Size = new System.Drawing.Size(641, 719);
+            this.tabPageOrder.Size = new System.Drawing.Size(646, 531);
             this.tabPageOrder.TabIndex = 1;
             this.tabPageOrder.Text = "订单";
             this.tabPageOrder.UseVisualStyleBackColor = true;
-            // 
-            // dataGridViewPosition
-            // 
-            this.dataGridViewPosition.AllowUserToAddRows = false;
-            this.dataGridViewPosition.AllowUserToDeleteRows = false;
-            this.dataGridViewPosition.AllowUserToOrderColumns = true;
-            this.dataGridViewPosition.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridViewPosition.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataGridViewPosition.Location = new System.Drawing.Point(3, 4);
-            this.dataGridViewPosition.Name = "dataGridViewPosition";
-            this.dataGridViewPosition.ReadOnly = true;
-            this.dataGridViewPosition.RowTemplate.Height = 23;
-            this.dataGridViewPosition.Size = new System.Drawing.Size(635, 711);
-            this.dataGridViewPosition.TabIndex = 0;
-            // 
-            // dataGridViewOrder
-            // 
-            this.dataGridViewOrder.AllowUserToAddRows = false;
-            this.dataGridViewOrder.AllowUserToDeleteRows = false;
-            this.dataGridViewOrder.AllowUserToOrderColumns = true;
-            this.dataGridViewOrder.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridViewOrder.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.dataGridViewOrder.Location = new System.Drawing.Point(3, 51);
-            this.dataGridViewOrder.Name = "dataGridViewOrder";
-            this.dataGridViewOrder.ReadOnly = true;
-            this.dataGridViewOrder.RowTemplate.Height = 23;
-            this.dataGridViewOrder.Size = new System.Drawing.Size(635, 664);
-            this.dataGridViewOrder.TabIndex = 0;
             // 
             // buttonExport
             // 
@@ -169,15 +162,34 @@
             this.buttonExport.Text = "导出数据";
             this.buttonExport.UseVisualStyleBackColor = true;
             // 
+            // dataGridViewOrder
+            // 
+            this.dataGridViewOrder.AllowUserToAddRows = false;
+            this.dataGridViewOrder.AllowUserToDeleteRows = false;
+            this.dataGridViewOrder.AllowUserToOrderColumns = true;
+            this.dataGridViewOrder.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
+            this.dataGridViewOrder.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
+            this.dataGridViewOrder.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridViewOrder.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.dataGridViewOrder.Location = new System.Drawing.Point(3, 51);
+            this.dataGridViewOrder.Name = "dataGridViewOrder";
+            this.dataGridViewOrder.ReadOnly = true;
+            this.dataGridViewOrder.RowTemplate.Height = 23;
+            this.dataGridViewOrder.Size = new System.Drawing.Size(640, 476);
+            this.dataGridViewOrder.TabIndex = 0;
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(915, 749);
+            this.ClientSize = new System.Drawing.Size(884, 561);
             this.Controls.Add(this.splitContainerMain);
             this.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.MaximizeBox = false;
             this.Name = "FormMain";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "StrategyTools";
             this.Shown += new System.EventHandler(this.FormMain_Shown);
             this.splitContainerMain.Panel1.ResumeLayout(false);
@@ -187,8 +199,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewStrategy)).EndInit();
             this.tabControl1.ResumeLayout(false);
             this.tabPagePosition.ResumeLayout(false);
-            this.tabPageOrder.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewPosition)).EndInit();
+            this.tabPageOrder.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewOrder)).EndInit();
             this.ResumeLayout(false);
 

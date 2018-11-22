@@ -18,7 +18,7 @@ namespace QuantEngine
             run();
         }
 
-        public bool add(MessageType type,object value)
+        public bool add(MessageType type, object value)
         {
             if (queue.Count < mMaxLen)
             {
@@ -35,9 +35,10 @@ namespace QuantEngine
         private Thread mThread;
         private void run()
         {
-            if(mThread == null || !mThread.IsAlive)
+            if (mThread == null || !mThread.IsAlive)
             {
-                mThread = new Thread(()=> {
+                mThread = new Thread(() =>
+                {
                     try
                     {
                         execute();
@@ -55,8 +56,11 @@ namespace QuantEngine
         public event OnMessage OnMessage;
         private void execute()
         {
-            Message m = queue.Take();
+            while (true)
+            {
+                Message m = queue.Take();
                 OnMessage?.Invoke(m);
+            }
         }
     }
 
