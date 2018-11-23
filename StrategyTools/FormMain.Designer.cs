@@ -37,6 +37,9 @@
             this.tabPageOrder = new System.Windows.Forms.TabPage();
             this.buttonExport = new System.Windows.Forms.Button();
             this.dataGridViewOrder = new System.Windows.Forms.DataGridView();
+            this.buttonPageBefore = new System.Windows.Forms.Button();
+            this.labelPage = new System.Windows.Forms.Label();
+            this.buttonPageAfter = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMain)).BeginInit();
             this.splitContainerMain.Panel1.SuspendLayout();
             this.splitContainerMain.Panel2.SuspendLayout();
@@ -85,7 +88,6 @@
             // 
             this.dataGridViewStrategy.AllowUserToAddRows = false;
             this.dataGridViewStrategy.AllowUserToDeleteRows = false;
-            this.dataGridViewStrategy.AllowUserToOrderColumns = true;
             this.dataGridViewStrategy.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.dataGridViewStrategy.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
             this.dataGridViewStrategy.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -119,7 +121,7 @@
             this.tabPagePosition.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.tabPagePosition.Name = "tabPagePosition";
             this.tabPagePosition.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.tabPagePosition.Size = new System.Drawing.Size(709, 699);
+            this.tabPagePosition.Size = new System.Drawing.Size(646, 531);
             this.tabPagePosition.TabIndex = 0;
             this.tabPagePosition.Text = "持仓";
             this.tabPagePosition.UseVisualStyleBackColor = true;
@@ -128,7 +130,6 @@
             // 
             this.dataGridViewPosition.AllowUserToAddRows = false;
             this.dataGridViewPosition.AllowUserToDeleteRows = false;
-            this.dataGridViewPosition.AllowUserToOrderColumns = true;
             this.dataGridViewPosition.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.dataGridViewPosition.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
             this.dataGridViewPosition.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -137,11 +138,14 @@
             this.dataGridViewPosition.Name = "dataGridViewPosition";
             this.dataGridViewPosition.ReadOnly = true;
             this.dataGridViewPosition.RowTemplate.Height = 23;
-            this.dataGridViewPosition.Size = new System.Drawing.Size(703, 691);
+            this.dataGridViewPosition.Size = new System.Drawing.Size(640, 523);
             this.dataGridViewPosition.TabIndex = 0;
             // 
             // tabPageOrder
             // 
+            this.tabPageOrder.Controls.Add(this.buttonPageAfter);
+            this.tabPageOrder.Controls.Add(this.labelPage);
+            this.tabPageOrder.Controls.Add(this.buttonPageBefore);
             this.tabPageOrder.Controls.Add(this.buttonExport);
             this.tabPageOrder.Controls.Add(this.dataGridViewOrder);
             this.tabPageOrder.Location = new System.Drawing.Point(4, 26);
@@ -155,7 +159,7 @@
             // 
             // buttonExport
             // 
-            this.buttonExport.Location = new System.Drawing.Point(6, 8);
+            this.buttonExport.Location = new System.Drawing.Point(285, 8);
             this.buttonExport.Name = "buttonExport";
             this.buttonExport.Size = new System.Drawing.Size(75, 37);
             this.buttonExport.TabIndex = 1;
@@ -166,7 +170,6 @@
             // 
             this.dataGridViewOrder.AllowUserToAddRows = false;
             this.dataGridViewOrder.AllowUserToDeleteRows = false;
-            this.dataGridViewOrder.AllowUserToOrderColumns = true;
             this.dataGridViewOrder.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.dataGridViewOrder.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
             this.dataGridViewOrder.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -177,6 +180,34 @@
             this.dataGridViewOrder.RowTemplate.Height = 23;
             this.dataGridViewOrder.Size = new System.Drawing.Size(640, 476);
             this.dataGridViewOrder.TabIndex = 0;
+            this.dataGridViewOrder.VirtualMode = true;
+            // 
+            // buttonPageBefore
+            // 
+            this.buttonPageBefore.Location = new System.Drawing.Point(6, 8);
+            this.buttonPageBefore.Name = "buttonPageBefore";
+            this.buttonPageBefore.Size = new System.Drawing.Size(60, 37);
+            this.buttonPageBefore.TabIndex = 2;
+            this.buttonPageBefore.Text = "上一页";
+            this.buttonPageBefore.UseVisualStyleBackColor = true;
+            // 
+            // labelPage
+            // 
+            this.labelPage.AutoSize = true;
+            this.labelPage.Location = new System.Drawing.Point(87, 18);
+            this.labelPage.Name = "labelPage";
+            this.labelPage.Size = new System.Drawing.Size(82, 17);
+            this.labelPage.TabIndex = 4;
+            this.labelPage.Text = "共0页，第0页";
+            // 
+            // buttonPageAfter
+            // 
+            this.buttonPageAfter.Location = new System.Drawing.Point(206, 7);
+            this.buttonPageAfter.Name = "buttonPageAfter";
+            this.buttonPageAfter.Size = new System.Drawing.Size(60, 37);
+            this.buttonPageAfter.TabIndex = 5;
+            this.buttonPageAfter.Text = "下一页";
+            this.buttonPageAfter.UseVisualStyleBackColor = true;
             // 
             // FormMain
             // 
@@ -201,6 +232,7 @@
             this.tabPagePosition.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewPosition)).EndInit();
             this.tabPageOrder.ResumeLayout(false);
+            this.tabPageOrder.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewOrder)).EndInit();
             this.ResumeLayout(false);
 
@@ -217,6 +249,9 @@
         private System.Windows.Forms.DataGridView dataGridViewPosition;
         private System.Windows.Forms.Button buttonExport;
         private System.Windows.Forms.DataGridView dataGridViewOrder;
+        private System.Windows.Forms.Button buttonPageAfter;
+        private System.Windows.Forms.Label labelPage;
+        private System.Windows.Forms.Button buttonPageBefore;
     }
 }
 
