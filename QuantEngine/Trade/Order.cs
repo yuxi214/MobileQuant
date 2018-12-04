@@ -133,22 +133,38 @@ namespace QuantEngine
             int traded = 0; //已成
             int currentTrade = 0; //当前成交
 
-            bool normal = true;
-            bool partial = true;
-            bool filled = true;
-            bool error = true;
-            bool cancled = true;
+            int normalCount = 0;
+            int partialCount = 0;
+            int filledCount = 0;
+            int errorCount = 0;
+            int cancledCount = 0;
 
-            //统计
+            /*统计，这个地方有点复杂，会出现子订单一个正常，一个错误，一个撤单这种情况，
+             * partial>normal>canceled
+             */
             foreach (SubOrder sOrder in mSubOrders)
             {
                 left += sOrder.VolumeLeft;
                 traded += sOrder.VolumeTraded;
-
-                normal = normal && sOrder.Status == OrderStatus.Normal;
-                filled = filled && sOrder.Status == OrderStatus.Filled;
-                error = error && sOrder.Status == OrderStatus.Error;
-                cancled = cancled && sOrder.Status == OrderStatus.Canceled;
+                //
+                switch (sOrder.Status)
+                {
+                    case OrderStatus.Normal:
+                        normalCount++;
+                        break;
+                    case OrderStatus.Partial:
+                        partialCount++;
+                        break;
+                    case OrderStatus.Filled:
+                        filledCount++;
+                        break;
+                    case OrderStatus.Error:
+                        errorCount++;
+                        break;
+                    case OrderStatus.Canceled:
+                        cancledCount++;
+                        break;
+                }
             }
 
             mVolumeLeft = left;
@@ -169,25 +185,25 @@ namespace QuantEngine
             }
 
             //状态
-            if (normal)
+            if (partialCount > 0)
+            {
+                mStatus = OrderStatus.Partial;
+            }
+            else if (normalCount > 0)
             {
                 mStatus = OrderStatus.Normal;
             }
-            else if (filled)
+            else if (filledCount == mSubOrders.Count)
             {
                 mStatus = OrderStatus.Filled;
             }
-            else if (error)
+            else if (errorCount == mSubOrders.Count)
             {
                 mStatus = OrderStatus.Error;
             }
-            else if (cancled)
-            {
-                mStatus = OrderStatus.Canceled;
-            }
             else
             {
-                mStatus = OrderStatus.Partial;
+                mStatus = OrderStatus.Canceled;
             }
 
             //订单状态变化

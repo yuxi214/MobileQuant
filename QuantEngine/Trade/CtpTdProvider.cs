@@ -239,24 +239,7 @@ namespace QuantEngine
                 return;
             foreach (SubOrder subOrder in order.SubOrders)
             {
-                if (subOrder.OrderID.Equals(string.Empty))
-                {
-                    Utils.EnginLog($"撤单错误|未找到订单编号：{subOrder.InstrumentID}|{subOrder.Direction}|{subOrder.Offset}|{subOrder.LimitPrice}|{subOrder.Volume}|{subOrder.CustomID}");
-                    continue;
-                }
-                int rtn;
-                rtn = mTrader.ReqOrderAction(subOrder.OrderID);
-
-                //这种情况多是盘后未撤订单，按撤单处理
-                if(rtn == -1)
-                {
-                    subOrder.Status = OrderStatus.Canceled;
-                    subOrder.VolumeLeft = 0;
-                    activeOrders.Remove(subOrder);
-                    subOrder.Refresh();
-                }
-
-                Utils.EnginLog($"撤单：{rtn}|{subOrder.InstrumentID}|{subOrder.Direction}|{subOrder.Offset}|{subOrder.LimitPrice}|{subOrder.Volume}|{subOrder.CustomID}|{subOrder.OrderID}");
+                cancelOrder(subOrder);
             }
         }
         //发送订单
@@ -296,15 +279,35 @@ namespace QuantEngine
             Utils.EnginLog($"发单：{rtn}\t{subOrder.CustomID}\t{subOrder.InstrumentID}\t{subOrder.Direction}\t{subOrder.Offset}\t{subOrder.LimitPrice}\t{subOrder.Volume}");
         }
         //撤销订单
-        private void CancelOrder(SubOrder subOrder)
+        private void cancelOrder(SubOrder subOrder)
         {
-            if (subOrder.OrderID == string.Empty)
+            //
+            if (subOrder.OrderID.Equals(string.Empty))
             {
-                Utils.EnginLog($"撤单|错误|还未更新orderID：{subOrder.CustomID}|{subOrder.InstrumentID}|{subOrder.Direction}|{subOrder.Offset}|{subOrder.LimitPrice}");
+                Utils.EnginLog($"撤单错误|未找到订单编号：{subOrder.InstrumentID}|{subOrder.Direction}|{subOrder.Offset}|{subOrder.LimitPrice}|{subOrder.Volume}|{subOrder.CustomID}");
                 return;
             }
-            mTrader.ReqOrderAction(subOrder.OrderID);
-            Utils.EnginLog($"撤单：{subOrder.OrderID}|{subOrder.InstrumentID}|{subOrder.Direction}|{subOrder.Offset}|{subOrder.LimitPrice}|{subOrder.Volume}|{subOrder.VolumeLeft}");
+            //
+            if (subOrder.Status == OrderStatus.Canceled
+                || subOrder.Status == OrderStatus.Error
+                || subOrder.Status == OrderStatus.Filled)
+            {
+                return;
+            }
+            //
+            int rtn;
+            rtn = mTrader.ReqOrderAction(subOrder.OrderID);
+
+            //这种情况多是盘后未撤订单，按撤单处理
+            if (rtn == -1)
+            {
+                subOrder.Status = OrderStatus.Canceled;
+                subOrder.VolumeLeft = 0;
+                activeOrders.Remove(subOrder);
+                subOrder.Refresh();
+            }
+
+            Utils.EnginLog($"撤单：{rtn}|{subOrder.InstrumentID}|{subOrder.Direction}|{subOrder.Offset}|{subOrder.LimitPrice}|{subOrder.Volume}|{subOrder.CustomID}|{subOrder.OrderID}");
         }
         //撤单回报
         private void _OnRtnCancel(object sender, OrderArgs e)
