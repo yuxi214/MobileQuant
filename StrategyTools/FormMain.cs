@@ -36,7 +36,7 @@ namespace StrategyTools
 
         public void showPosition(DataTable dt)
         {
-            //绑定第一页
+            //绑定
             dataGridViewPosition.DataSource = dt;
             if (dataGridViewPosition.Rows.Count > 0)
             {
@@ -98,6 +98,74 @@ namespace StrategyTools
             string strategyName = (string)dataGridViewStrategy.Rows[e.RowIndex].Cells["strategy_name"].Value;
             mPresenter.loadPosition(strategyName);
             mPresenter.loadOrder(strategyName);
+        }
+
+        private void dataGridViewStrategy_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                if (e.RowIndex >= 0)
+                {
+                    //若行已是选中状态就不再进行设置
+                    if (dataGridViewStrategy.Rows[e.RowIndex].Selected == false)
+                    {
+                        dataGridViewStrategy.ClearSelection();
+                        dataGridViewStrategy.Rows[e.RowIndex].Selected = true;
+                    }
+                    //只选中一行时设置活动单元格
+                    if (dataGridViewStrategy.SelectedRows.Count == 1)
+                    {
+                        dataGridViewStrategy.CurrentCell = dataGridViewStrategy.Rows[e.RowIndex].Cells[0];
+                    }
+                    //弹出操作菜单
+                    contextMenuStripStrategy.Show(MousePosition.X, MousePosition.Y);
+                }
+            }
+        }
+
+        private void dataGridViewPosition_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                if (e.RowIndex >= 0)
+                {
+                    //若行已是选中状态就不再进行设置
+                    if (dataGridViewPosition.Rows[e.RowIndex].Selected == false)
+                    {
+                        dataGridViewPosition.ClearSelection();
+                        dataGridViewPosition.Rows[e.RowIndex].Selected = true;
+                    }
+                    //只选中一行时设置活动单元格
+                    if (dataGridViewPosition.SelectedRows.Count == 1)
+                    {
+                        dataGridViewPosition.CurrentCell = dataGridViewPosition.Rows[e.RowIndex].Cells[2];
+                    }
+                    //弹出操作菜单
+                    contextMenuStripPosition.Show(MousePosition.X, MousePosition.Y);
+                }
+            }
+        }
+
+        private void toolStripMenuItemDelete_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("删除策略将会删除持仓和交易记录！", "删除持仓？", MessageBoxButtons.OKCancel) == DialogResult.OK)
+
+            {
+
+                //delete
+
+            }
+        }
+
+        private void toolStripMenuItemSet_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Delete this user?", "Confirm Message", MessageBoxButtons.OKCancel) == DialogResult.OK)
+
+            {
+
+                //delete
+
+            }
         }
     }
 }

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.splitContainerMain = new System.Windows.Forms.SplitContainer();
             this.buttonStartStrategy = new System.Windows.Forms.Button();
             this.dataGridViewStrategy = new System.Windows.Forms.DataGridView();
@@ -35,11 +36,15 @@
             this.tabPagePosition = new System.Windows.Forms.TabPage();
             this.dataGridViewPosition = new System.Windows.Forms.DataGridView();
             this.tabPageOrder = new System.Windows.Forms.TabPage();
+            this.buttonPageAfter = new System.Windows.Forms.Button();
+            this.labelPage = new System.Windows.Forms.Label();
+            this.buttonPageBefore = new System.Windows.Forms.Button();
             this.buttonExport = new System.Windows.Forms.Button();
             this.dataGridViewOrder = new System.Windows.Forms.DataGridView();
-            this.buttonPageBefore = new System.Windows.Forms.Button();
-            this.labelPage = new System.Windows.Forms.Label();
-            this.buttonPageAfter = new System.Windows.Forms.Button();
+            this.contextMenuStripStrategy = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.toolStripMenuItemDelete = new System.Windows.Forms.ToolStripMenuItem();
+            this.contextMenuStripPosition = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.toolStripMenuItemSet = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerMain)).BeginInit();
             this.splitContainerMain.Panel1.SuspendLayout();
             this.splitContainerMain.Panel2.SuspendLayout();
@@ -50,6 +55,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewPosition)).BeginInit();
             this.tabPageOrder.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewOrder)).BeginInit();
+            this.contextMenuStripStrategy.SuspendLayout();
+            this.contextMenuStripPosition.SuspendLayout();
             this.SuspendLayout();
             // 
             // splitContainerMain
@@ -101,6 +108,7 @@
             this.dataGridViewStrategy.Size = new System.Drawing.Size(225, 484);
             this.dataGridViewStrategy.TabIndex = 0;
             this.dataGridViewStrategy.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewStrategy_CellClick);
+            this.dataGridViewStrategy.CellMouseDown += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridViewStrategy_CellMouseDown);
             // 
             // tabControl1
             // 
@@ -138,8 +146,10 @@
             this.dataGridViewPosition.Name = "dataGridViewPosition";
             this.dataGridViewPosition.ReadOnly = true;
             this.dataGridViewPosition.RowTemplate.Height = 23;
+            this.dataGridViewPosition.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridViewPosition.Size = new System.Drawing.Size(640, 523);
             this.dataGridViewPosition.TabIndex = 0;
+            this.dataGridViewPosition.CellMouseDown += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridViewPosition_CellMouseDown);
             // 
             // tabPageOrder
             // 
@@ -156,6 +166,33 @@
             this.tabPageOrder.TabIndex = 1;
             this.tabPageOrder.Text = "订单";
             this.tabPageOrder.UseVisualStyleBackColor = true;
+            // 
+            // buttonPageAfter
+            // 
+            this.buttonPageAfter.Location = new System.Drawing.Point(206, 7);
+            this.buttonPageAfter.Name = "buttonPageAfter";
+            this.buttonPageAfter.Size = new System.Drawing.Size(60, 37);
+            this.buttonPageAfter.TabIndex = 5;
+            this.buttonPageAfter.Text = "下一页";
+            this.buttonPageAfter.UseVisualStyleBackColor = true;
+            // 
+            // labelPage
+            // 
+            this.labelPage.AutoSize = true;
+            this.labelPage.Location = new System.Drawing.Point(87, 18);
+            this.labelPage.Name = "labelPage";
+            this.labelPage.Size = new System.Drawing.Size(82, 17);
+            this.labelPage.TabIndex = 4;
+            this.labelPage.Text = "共0页，第0页";
+            // 
+            // buttonPageBefore
+            // 
+            this.buttonPageBefore.Location = new System.Drawing.Point(6, 8);
+            this.buttonPageBefore.Name = "buttonPageBefore";
+            this.buttonPageBefore.Size = new System.Drawing.Size(60, 37);
+            this.buttonPageBefore.TabIndex = 2;
+            this.buttonPageBefore.Text = "上一页";
+            this.buttonPageBefore.UseVisualStyleBackColor = true;
             // 
             // buttonExport
             // 
@@ -178,36 +215,38 @@
             this.dataGridViewOrder.Name = "dataGridViewOrder";
             this.dataGridViewOrder.ReadOnly = true;
             this.dataGridViewOrder.RowTemplate.Height = 23;
+            this.dataGridViewOrder.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridViewOrder.Size = new System.Drawing.Size(640, 476);
             this.dataGridViewOrder.TabIndex = 0;
             this.dataGridViewOrder.VirtualMode = true;
             // 
-            // buttonPageBefore
+            // contextMenuStripStrategy
             // 
-            this.buttonPageBefore.Location = new System.Drawing.Point(6, 8);
-            this.buttonPageBefore.Name = "buttonPageBefore";
-            this.buttonPageBefore.Size = new System.Drawing.Size(60, 37);
-            this.buttonPageBefore.TabIndex = 2;
-            this.buttonPageBefore.Text = "上一页";
-            this.buttonPageBefore.UseVisualStyleBackColor = true;
+            this.contextMenuStripStrategy.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItemDelete});
+            this.contextMenuStripStrategy.Name = "contextMenuStripStrategy";
+            this.contextMenuStripStrategy.Size = new System.Drawing.Size(101, 26);
             // 
-            // labelPage
+            // toolStripMenuItemDelete
             // 
-            this.labelPage.AutoSize = true;
-            this.labelPage.Location = new System.Drawing.Point(87, 18);
-            this.labelPage.Name = "labelPage";
-            this.labelPage.Size = new System.Drawing.Size(82, 17);
-            this.labelPage.TabIndex = 4;
-            this.labelPage.Text = "共0页，第0页";
+            this.toolStripMenuItemDelete.Name = "toolStripMenuItemDelete";
+            this.toolStripMenuItemDelete.Size = new System.Drawing.Size(152, 22);
+            this.toolStripMenuItemDelete.Text = "删除";
+            this.toolStripMenuItemDelete.Click += new System.EventHandler(this.toolStripMenuItemDelete_Click);
             // 
-            // buttonPageAfter
+            // contextMenuStripPosition
             // 
-            this.buttonPageAfter.Location = new System.Drawing.Point(206, 7);
-            this.buttonPageAfter.Name = "buttonPageAfter";
-            this.buttonPageAfter.Size = new System.Drawing.Size(60, 37);
-            this.buttonPageAfter.TabIndex = 5;
-            this.buttonPageAfter.Text = "下一页";
-            this.buttonPageAfter.UseVisualStyleBackColor = true;
+            this.contextMenuStripPosition.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItemSet});
+            this.contextMenuStripPosition.Name = "contextMenuStripPosition";
+            this.contextMenuStripPosition.Size = new System.Drawing.Size(153, 48);
+            // 
+            // toolStripMenuItemSet
+            // 
+            this.toolStripMenuItemSet.Name = "toolStripMenuItemSet";
+            this.toolStripMenuItemSet.Size = new System.Drawing.Size(152, 22);
+            this.toolStripMenuItemSet.Text = "修改持仓";
+            this.toolStripMenuItemSet.Click += new System.EventHandler(this.toolStripMenuItemSet_Click);
             // 
             // FormMain
             // 
@@ -234,6 +273,8 @@
             this.tabPageOrder.ResumeLayout(false);
             this.tabPageOrder.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewOrder)).EndInit();
+            this.contextMenuStripStrategy.ResumeLayout(false);
+            this.contextMenuStripPosition.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -252,6 +293,10 @@
         private System.Windows.Forms.Button buttonPageAfter;
         private System.Windows.Forms.Label labelPage;
         private System.Windows.Forms.Button buttonPageBefore;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStripStrategy;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemDelete;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStripPosition;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemSet;
     }
 }
 

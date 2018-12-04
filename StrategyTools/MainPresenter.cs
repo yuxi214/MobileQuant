@@ -21,14 +21,26 @@ namespace StrategyTools
             mView.showStrategy(mModel.StrategyTable);
         }
 
-        public void loadPosition(string strategyName)
+        internal void loadPosition(string strategyName)
         {
             mView.showPosition(mModel.getPositionTable(strategyName));
         }
 
-        public void loadOrder(string strategyName)
+        internal void loadOrder(string strategyName)
         {
             mView.showOrder(mModel.getOrderTable(strategyName));
+        }
+
+        internal void setPostion(string strategyName, string instrumentID, int position)
+        {
+            mModel.setPosition(strategyName, instrumentID, position);
+            loadPosition(strategyName);
+        }
+
+        internal void deleteStrategy(string strategyName)
+        {
+            mModel.deleteStrategy(strategyName);
+            mView.showStrategy(mModel.StrategyTable);
         }
     }
 }

@@ -168,10 +168,43 @@ namespace StrategyTools
             }
         }
 
+        //
         internal DataTable getOrderTable(string strategyName)
         {
             DataTable t;
             return orderDic.TryGetValue(strategyName, out t) ? t : new DataTable();
+        }
+
+        //
+        internal void deleteStrategy(string strategyName)
+        {
+            try
+            {
+                //删持仓
+                string sql = @"delete
+                            from [t_position]
+                            where [strategy_name] = '@strategyName'";
+                SQLiteHelper.ExecuteNonQuery(sql
+                    , new System.Data.SQLite.SQLiteParameter("strategyName", strategyName));
+
+                //删订单
+                sql = @"delete
+                            from [t_order]
+                            where [strategy_name] = '@strategyName'";
+                SQLiteHelper.ExecuteNonQuery(sql
+                    , new System.Data.SQLite.SQLiteParameter("strategyName", strategyName));
+
+                //删缓存
+                DataRow[] rows = strategyTable.Select($"strategy_name='{strategyName}'");
+                foreach(var r in rows)
+                {
+                    strategyTable.Rows.Remove(r);
+                }
+            }catch (Exception ex)
+            {
+                MessageBox.Show(ex.StackTrace);
+            }
+
         }
 
     }
