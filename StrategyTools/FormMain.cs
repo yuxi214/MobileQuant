@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.VisualBasic;
 
 namespace StrategyTools
 {
@@ -21,12 +16,7 @@ namespace StrategyTools
         private void FormMain_Shown(object sender, EventArgs e)
         {
             mPresenter = new MainPresenter(this);
-            if (dataGridViewStrategy.Rows.Count > 0)
-            {
-                string strategyName = (string)dataGridViewStrategy.Rows[0].Cells["strategy_name"].Value;
-                mPresenter.loadPosition(strategyName);
-                mPresenter.loadOrder(strategyName);
-            }
+            showDefault();
         }
 
         public void showStrategy(DataTable dt)
@@ -148,23 +138,39 @@ namespace StrategyTools
 
         private void toolStripMenuItemDelete_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("删除策略将会删除持仓和交易记录！", "删除持仓？", MessageBoxButtons.OKCancel) == DialogResult.OK)
-
+            string strategyName = (string)dataGridViewStrategy.SelectedRows[0].Cells["strategy_name"].Value;
+            if (MessageBox.Show($"删除策略{strategyName}！", "删除持仓？", MessageBoxButtons.OKCancel) == DialogResult.OK)
             {
-
-                //delete
-
+                mPresenter.deleteStrategy(strategyName);
             }
+            //
+            showDefault();
         }
 
         private void toolStripMenuItemSet_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("Delete this user?", "Confirm Message", MessageBoxButtons.OKCancel) == DialogResult.OK)
-
+            string strategyName = (string)dataGridViewStrategy.SelectedRows[0].Cells["strategy_name"].Value;
+            string instrumentID = (string)dataGridViewPosition.SelectedRows[0].Cells["instrument_id"].Value;
+            string s = Interaction.InputBox($"更改策略{strategyName}，{instrumentID}的持仓", "更改持仓", "", -1, -1);
+            try
             {
+                int position = Convert.ToInt32(s);
+                mPresenter.setPostion(strategyName, instrumentID, position);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.StackTrace);
+            }
 
-                //delete
+        }
 
+        private void showDefault()
+        {
+            if (dataGridViewStrategy.Rows.Count > 0)
+            {
+                string name = (string)dataGridViewStrategy.Rows[0].Cells["strategy_name"].Value;
+                mPresenter.loadPosition(name);
+                mPresenter.loadOrder(name);
             }
         }
     }

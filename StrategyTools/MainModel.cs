@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Data;
 using System.IO;
 using System.Reflection;
@@ -98,14 +95,14 @@ namespace StrategyTools
 
             //加载持仓
             DataTable positionTable = SQLiteHelper.GetDataTable(QUERY_POSITION);
-            foreach(DataRow row in positionTable.Rows)
+            foreach (DataRow row in positionTable.Rows)
             {
                 string strategyName = row.Field<string>("strategy_name");
                 if (strategyTable.Select($"strategy_name = '{strategyName}'").Length == 0)
                     strategyTable.Rows.Add(strategyName, false);
 
                 DataTable t;
-                if (!positionDic.TryGetValue(strategyName,out t))
+                if (!positionDic.TryGetValue(strategyName, out t))
                 {
                     t = positionTable.Clone();
                     positionDic.Add(strategyName, t);
@@ -115,7 +112,7 @@ namespace StrategyTools
 
             //加载订单
             DataTable orderTable = SQLiteHelper.GetDataTable(QUERY_ORDER);
-            foreach(DataRow row in orderTable.Rows)
+            foreach (DataRow row in orderTable.Rows)
             {
                 string strategyName = row.Field<string>("strategy_name");
                 if (strategyTable.Select($"strategy_name = '{strategyName}'").Length == 0)
@@ -137,20 +134,19 @@ namespace StrategyTools
             DataTable t;
             return positionDic.TryGetValue(strategyName, out t) ? t : new DataTable();
         }
-        internal void setPosition(string strategyName,string instrumentID,int position)
+        internal void setPosition(string strategyName, string instrumentID, int position)
         {
             try
             {
                 //修改数据库
-                string sql = @"replace into [t_position]
-                            ([strategy_name], [instrument_id], [position], [last_time])
-                            values
-                            (@strategyName,@instrumentID,@position,@lastTime)";
+                string sql = @"update [t_position]
+                            set [position] = @position,[last_time] = @lastTime
+                            where [strategy_name] = @strategyName and [instrument_id] = @instrumentID";
                 SQLiteHelper.ExecuteNonQuery(sql
-                    , new System.Data.SQLite.SQLiteParameter("strategyName",strategyName)
-                    , new System.Data.SQLite.SQLiteParameter("instrumentID",instrumentID)
-                    , new System.Data.SQLite.SQLiteParameter("position",position)
-                    , new System.Data.SQLite.SQLiteParameter("lastTime",DateTime.Now));
+                    , new System.Data.SQLite.SQLiteParameter("strategyName", strategyName)
+                    , new System.Data.SQLite.SQLiteParameter("instrumentID", instrumentID)
+                    , new System.Data.SQLite.SQLiteParameter("position", position)
+                    , new System.Data.SQLite.SQLiteParameter("lastTime", DateTime.Now));
 
                 //修改缓存
                 DataTable t;
@@ -162,7 +158,8 @@ namespace StrategyTools
                         rows[0]["position"] = position;
                     }
                 }
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.StackTrace);
             }
@@ -183,24 +180,25 @@ namespace StrategyTools
                 //删持仓
                 string sql = @"delete
                             from [t_position]
-                            where [strategy_name] = '@strategyName'";
+                            where [strategy_name] = @strategyName";
                 SQLiteHelper.ExecuteNonQuery(sql
                     , new System.Data.SQLite.SQLiteParameter("strategyName", strategyName));
 
                 //删订单
                 sql = @"delete
-                            from [t_order]
-                            where [strategy_name] = '@strategyName'";
+                        from [t_order]
+                        where [strategy_name] = @strategyName";
                 SQLiteHelper.ExecuteNonQuery(sql
                     , new System.Data.SQLite.SQLiteParameter("strategyName", strategyName));
 
                 //删缓存
                 DataRow[] rows = strategyTable.Select($"strategy_name='{strategyName}'");
-                foreach(var r in rows)
+                foreach (var r in rows)
                 {
                     strategyTable.Rows.Remove(r);
                 }
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.StackTrace);
             }

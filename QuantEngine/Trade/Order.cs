@@ -128,6 +128,12 @@ namespace QuantEngine
         {
             if (mSubOrders == null)
                 return;
+            if (mStatus == OrderStatus.Canceled)
+                return;
+            if (mStatus == OrderStatus.Error)
+                return;
+            if (mStatus == OrderStatus.Filled)
+                return;
 
             int left = 0; //未成
             int traded = 0; //已成
@@ -144,6 +150,7 @@ namespace QuantEngine
              */
             foreach (SubOrder sOrder in mSubOrders)
             {
+                //
                 left += sOrder.VolumeLeft;
                 traded += sOrder.VolumeTraded;
                 //
