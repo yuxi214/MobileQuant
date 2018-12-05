@@ -65,6 +65,10 @@ namespace QuantEngine
 
         public double Price
         {
+            internal set
+            {
+                mPrice = value;
+            }
             get
             {
                 return mPrice;

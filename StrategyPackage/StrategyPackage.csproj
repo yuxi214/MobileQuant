@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FishingOrder.cs" />
     <Compile Include="NotStrategy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestStrategy.cs" />

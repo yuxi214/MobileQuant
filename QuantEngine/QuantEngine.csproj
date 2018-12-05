@@ -84,6 +84,7 @@
     <Compile Include="Message\MessageType.cs" />
     <Compile Include="Trade\CtpTdProvider.cs" />
     <Compile Include="MarketData\IMdProvider.cs" />
+    <Compile Include="Trade\Instrument.cs" />
     <Compile Include="Trade\ITdProvider.cs" />
     <Compile Include="Message\MessageManager.cs" />
     <Compile Include="Trade\Order.cs" />

@@ -24,7 +24,7 @@ namespace QuantEngine
         private HashSet<string> mInstIDSet = new HashSet<string>();
 
         //最新tick
-        private Dictionary<string, Tick> lastTickMap = new Dictionary<string, Tick>();
+        private Dictionary<string, Tick> lastTickDic = new Dictionary<string, Tick>();
 
         //发送开始信号
         internal void SendStart()
@@ -49,7 +49,7 @@ namespace QuantEngine
         //发送tick
         internal void SendTick(Tick tick)
         {
-            lastTickMap[tick.InstrumentID] = tick;
+            lastTickDic[tick.InstrumentID] = tick;
             OnTick(tick);
         }
     }
@@ -99,6 +99,31 @@ namespace QuantEngine
             activeOrderList.Add(order);
             if (mTdProvider != null)
             {
+                Tick t;
+                double uper = 0;
+                double lower = 0;
+                if(lastTickDic.TryGetValue(order.InstrumentID,out t))
+                {
+                    uper = t.UpperLimitPrice;
+                    lower = t.LowerLimitPrice;
+                }
+                //
+                Instrument inst = mTdProvider.GetInstrument(order.InstrumentID);
+                double priceTick = inst.PriceTick;
+                //
+                if(inst != null)
+                {
+                    order.Price = ((int)(order.Price / priceTick)) * priceTick;
+                }
+                if(order.Price > uper && uper != 0)
+                {
+                    order.Price = uper;
+                }
+                else if(order.Price < lower)
+                {
+                    order.Price = lower;
+                }
+                //
                 mTdProvider.SendOrder(order);
             }
         }
@@ -125,13 +150,27 @@ namespace QuantEngine
             }
         }
 
+        //获取合约
+        public bool TryGetInstrument(string instrumentID,out Instrument inst)
+        {
+            inst = mTdProvider.GetInstrument(instrumentID);
+            if(inst != null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         //订单生成函数
         public Order BuyOrder(int vol)
         {
-            if (lastTickMap.ContainsKey(mMainInstID))
+            if (lastTickDic.ContainsKey(mMainInstID))
             {
                 double price = 0;
-                price = lastTickMap[mMainInstID].UpperLimitPrice;
+                price = lastTickDic[mMainInstID].UpperLimitPrice;
                 return BuyOrder(vol, price);
             }
             else
@@ -155,10 +194,10 @@ namespace QuantEngine
         }
         public Order SellOrder(int vol)
         {
-            if (lastTickMap.ContainsKey(mMainInstID))
+            if (lastTickDic.ContainsKey(mMainInstID))
             {
                 double price = 0;
-                price = lastTickMap[mMainInstID].LowerLimitPrice;
+                price = lastTickDic[mMainInstID].LowerLimitPrice;
                 return SellOrder(vol, price);
             }
             else
@@ -183,13 +222,13 @@ namespace QuantEngine
         public Order ToPositionOrder(int position)
         {
             int myPos = GetPosition(mMainInstID);
-            if (position > myPos && lastTickMap.ContainsKey(mMainInstID))
+            if (position > myPos && lastTickDic.ContainsKey(mMainInstID))
             {
-                return BuyOrder(position - myPos, lastTickMap[mMainInstID].UpperLimitPrice, mMainInstID);
+                return BuyOrder(position - myPos, lastTickDic[mMainInstID].UpperLimitPrice, mMainInstID);
             }
-            else if (position < myPos && lastTickMap.ContainsKey(mMainInstID))
+            else if (position < myPos && lastTickDic.ContainsKey(mMainInstID))
             {
-                return SellOrder(myPos - position, lastTickMap[mMainInstID].LowerLimitPrice, mMainInstID);
+                return SellOrder(myPos - position, lastTickDic[mMainInstID].LowerLimitPrice, mMainInstID);
             }
             else
             {

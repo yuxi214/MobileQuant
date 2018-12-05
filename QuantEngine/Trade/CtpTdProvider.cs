@@ -309,6 +309,46 @@ namespace QuantEngine
 
             Utils.EnginLog($"撤单：{rtn}|{subOrder.InstrumentID}|{subOrder.Direction}|{subOrder.Offset}|{subOrder.LimitPrice}|{subOrder.Volume}|{subOrder.CustomID}|{subOrder.OrderID}");
         }
+        //获取合约信息
+        public Instrument GetInstrument(string instrumentID)
+        {
+            InstrumentField field;
+            if(mTrader.DicInstrumentField.TryGetValue(instrumentID,out field))
+            {
+                Exchange exchange;
+                switch (field.ExchangeID)
+                {
+                    case HaiFeng.Exchange.CFFEX:
+                        exchange = Exchange.CFFEX;
+                        break;
+                    case HaiFeng.Exchange.CZCE:
+                        exchange = Exchange.CZCE;
+                        break;
+                    case HaiFeng.Exchange.DCE:
+                        exchange = Exchange.DCE;
+                        break;
+                    case HaiFeng.Exchange.INE:
+                        exchange = Exchange.INE;
+                        break;
+                    case HaiFeng.Exchange.SHFE:
+                        exchange = Exchange.SHFE;
+                        break;
+                    default:
+                        exchange = Exchange.CFFEX;
+                        break;
+                }
+                return new Instrument(instrumentID: field.InstrumentID
+                    , productID: field.ProductID
+                    , exchange: exchange
+                    , volumeMultiple: field.VolumeMultiple
+                    , priceTick: field.PriceTick
+                    , maxOrderVolume: field.MaxOrderVolume);
+            }
+            else
+            {
+                return null;
+            }
+        }
         //撤单回报
         private void _OnRtnCancel(object sender, OrderArgs e)
         {

@@ -18,5 +18,7 @@ namespace QuantEngine
         void SendOrder(Order order);
         //撤销订单
         void CancelOrder(Order order);
+        //获取合约信息
+        Instrument GetInstrument(string instrumentID);
     }
 }
