@@ -90,6 +90,7 @@
             this.buttonStartStrategy.TabIndex = 1;
             this.buttonStartStrategy.Text = "启动策略";
             this.buttonStartStrategy.UseVisualStyleBackColor = false;
+            this.buttonStartStrategy.Click += new System.EventHandler(this.buttonStartStrategy_Click);
             // 
             // dataGridViewStrategy
             // 
@@ -230,7 +231,7 @@
             // toolStripMenuItemDelete
             // 
             this.toolStripMenuItemDelete.Name = "toolStripMenuItemDelete";
-            this.toolStripMenuItemDelete.Size = new System.Drawing.Size(152, 22);
+            this.toolStripMenuItemDelete.Size = new System.Drawing.Size(100, 22);
             this.toolStripMenuItemDelete.Text = "删除";
             this.toolStripMenuItemDelete.Click += new System.EventHandler(this.toolStripMenuItemDelete_Click);
             // 
@@ -239,12 +240,12 @@
             this.contextMenuStripPosition.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItemSet});
             this.contextMenuStripPosition.Name = "contextMenuStripPosition";
-            this.contextMenuStripPosition.Size = new System.Drawing.Size(153, 48);
+            this.contextMenuStripPosition.Size = new System.Drawing.Size(125, 26);
             // 
             // toolStripMenuItemSet
             // 
             this.toolStripMenuItemSet.Name = "toolStripMenuItemSet";
-            this.toolStripMenuItemSet.Size = new System.Drawing.Size(152, 22);
+            this.toolStripMenuItemSet.Size = new System.Drawing.Size(124, 22);
             this.toolStripMenuItemSet.Text = "修改持仓";
             this.toolStripMenuItemSet.Click += new System.EventHandler(this.toolStripMenuItemSet_Click);
             // 

@@ -2,6 +2,7 @@
 using System.Data;
 using System.Windows.Forms;
 using Microsoft.VisualBasic;
+using System.Diagnostics;
 
 namespace StrategyTools
 {
@@ -172,6 +173,12 @@ namespace StrategyTools
                 mPresenter.loadPosition(name);
                 mPresenter.loadOrder(name);
             }
+        }
+
+        private void buttonStartStrategy_Click(object sender, EventArgs e)
+        {
+            Process.Start("MobileQuant.exe");
+            Close();
         }
     }
 }

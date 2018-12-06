@@ -310,7 +310,7 @@ namespace QuantEngine
             Utils.EnginLog($"撤单：{rtn}|{subOrder.InstrumentID}|{subOrder.Direction}|{subOrder.Offset}|{subOrder.LimitPrice}|{subOrder.Volume}|{subOrder.CustomID}|{subOrder.OrderID}");
         }
         //获取合约信息
-        public Instrument GetInstrument(string instrumentID)
+        public bool TryGetInstrument(string instrumentID,out Instrument inst)
         {
             InstrumentField field;
             if(mTrader.DicInstrumentField.TryGetValue(instrumentID,out field))
@@ -337,16 +337,18 @@ namespace QuantEngine
                         exchange = Exchange.CFFEX;
                         break;
                 }
-                return new Instrument(instrumentID: field.InstrumentID
+                inst = new Instrument(instrumentID: field.InstrumentID
                     , productID: field.ProductID
                     , exchange: exchange
                     , volumeMultiple: field.VolumeMultiple
                     , priceTick: field.PriceTick
                     , maxOrderVolume: field.MaxOrderVolume);
+                return true;
             }
             else
             {
-                return null;
+                inst = null;
+                return false;
             }
         }
         //撤单回报

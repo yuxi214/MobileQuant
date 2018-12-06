@@ -108,10 +108,14 @@ namespace QuantEngine
                     lower = t.LowerLimitPrice;
                 }
                 //
-                Instrument inst = mTdProvider.GetInstrument(order.InstrumentID);
-                double priceTick = inst.PriceTick;
+                Instrument inst;
+                double priceTick = 0;
+                if(mTdProvider.TryGetInstrument(order.InstrumentID,out inst))
+                {
+                    priceTick = inst.PriceTick;
+                }
                 //
-                if(inst != null)
+                if(priceTick != 0)
                 {
                     order.Price = ((int)(order.Price / priceTick)) * priceTick;
                 }
@@ -153,15 +157,7 @@ namespace QuantEngine
         //获取合约
         public bool TryGetInstrument(string instrumentID,out Instrument inst)
         {
-            inst = mTdProvider.GetInstrument(instrumentID);
-            if(inst != null)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return mTdProvider.TryGetInstrument(instrumentID,out inst);
         }
 
         //订单生成函数
