@@ -96,7 +96,7 @@ namespace QuantEngine
             mTrader.OnRtnCancel += _OnRtnCancel;
             //撤单错误
             mTrader.OnRtnErrCancel += _OnRtnErrCancel;
-
+            mTrader.OnRtnExchangeStatus += _OnRtnExchangeStatus;
             //开始连接
             mTrader.ReqConnect(mAccount.Server);
         }
@@ -424,6 +424,21 @@ namespace QuantEngine
             syncOrder(order, subOrder);
             Utils.EnginLog($"报单错误回报：{order.Custom}\t{order.InstrumentID}\t{order.Direction}\t{order.Offset}\t{order.LimitPrice}\t{order.Volume}\t{e.ErrorID}\t{e.ErrorMsg}");
             Interlocked.Exchange(ref BaseStrategy.Locker, 0);
+        }
+        //收盘
+        private void _OnRtnExchangeStatus(object sender, StatusEventArgs e)
+        {
+            //收盘后统一视为撤单
+            ExchangeStatusType status = e.Status;
+            if(status == ExchangeStatusType.Closed)
+            {
+                foreach(SubOrder s in activeOrders)
+                {
+                    s.VolumeLeft = 0;
+                    s.Status = OrderStatus.Canceled;
+                    s.Refresh();
+                }
+            }
         }
         //同步订单
         private void syncOrder(OrderField o, SubOrder s)
