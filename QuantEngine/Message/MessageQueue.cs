@@ -11,16 +11,27 @@ namespace QuantEngine
     internal class MessageQueue
     {
         private BlockingCollection<Message> queue = new BlockingCollection<Message>();
-        private int mMaxLen = 0;
-        public MessageQueue(int maxLen)
+        private static MessageQueue mInstance;
+        public static MessageQueue Instance
         {
-            mMaxLen = maxLen;
+            get
+            {
+                if (mInstance == null)
+                {
+                    mInstance = new MessageQueue();
+                }
+
+                return mInstance;
+            }
+        }
+        private MessageQueue()
+        {
             run();
         }
 
         public bool add(MessageType type, object value)
         {
-            if (queue.Count < mMaxLen)
+            if (queue.Count < 10000)
             {
                 Message m = new Message(type, value);
                 return queue.TryAdd(m, 1000);
@@ -41,11 +52,15 @@ namespace QuantEngine
                 {
                     try
                     {
-                        execute();
+                        while (true)
+                        {
+                            Message m = queue.Take();
+                            OnMessage?.Invoke(m);
+                        }
                     }
                     catch (Exception ex)
                     {
-                        Utils.EnginLog(ex.StackTrace);
+                        LogUtils.EnginLog(ex.StackTrace);
                     }
                 });
                 mThread.Start();
@@ -54,14 +69,6 @@ namespace QuantEngine
         }
 
         public event OnMessage OnMessage;
-        private void execute()
-        {
-            while (true)
-            {
-                Message m = queue.Take();
-                OnMessage?.Invoke(m);
-            }
-        }
     }
 
     internal class Message
@@ -93,8 +100,9 @@ namespace QuantEngine
     }
     internal enum MessageType
     {
-        position = 1,
-        order = 2
+        position,
+        order,
+        log
     }
 
     internal delegate void OnMessage(Message message);

@@ -261,7 +261,7 @@ namespace QuantEngine
         //些日志
         public void Log(string content)
         {
-            Utils.UserLog(content);
+            LogUtils.UserLog(content);
         }
     }
 }

@@ -39,13 +39,13 @@ namespace QuantEngine
         public void Run()
         {
             //账号
-            Account mac = Utils.Config.MyMdAccount;
-            Account tac = Utils.Config.MyTdAccount;
+            Account mac = ConfigUtils.Config.MyMdAccount;
+            Account tac = ConfigUtils.Config.MyTdAccount;
 
             //启动行情接口
             mMp.Login(mac);
             mMp.OnTick += _RtnTick;
-            foreach(string instrumentID in mStgManager.GetInstrumentIDs())
+            foreach (string instrumentID in mStgManager.GetInstrumentIDs())
             {
                 mMp.SubscribeMarketData(instrumentID);
             }

@@ -24,8 +24,8 @@ namespace QuantEngine
             mQueue.OnMessage += _onMessage;
         }
 
-        private MessageQueue mQueue = new MessageQueue(10000);
-        
+        private MessageQueue mQueue = MessageQueue.Instance;
+
         private void _onMessage(Message message)
         {
             switch (message.Type)
@@ -42,7 +42,7 @@ namespace QuantEngine
         }
 
         //持仓
-        public int GetPosition(string strategyName,string instrumentID)
+        public int GetPosition(string strategyName, string instrumentID)
         {
             string sql = $@" select position from t_position where strategy_name = '{strategyName}' and instrument_id = '{instrumentID}'";
             object vol = SQLiteHelper.ExecuteScalar(sql);
@@ -60,9 +60,9 @@ namespace QuantEngine
                             (@strategyName,@instrumentID,@vol,@lastTime)";
             SQLiteHelper.ExecuteNonQuery(sql
                 , new System.Data.SQLite.SQLiteParameter("strategyName", p.StrategyName)
-                , new System.Data.SQLite.SQLiteParameter("instrumentID",p.InstrumentID)
-                , new System.Data.SQLite.SQLiteParameter("vol",p.Vol)
-                , new System.Data.SQLite.SQLiteParameter("lastTime",p.LastTime));
+                , new System.Data.SQLite.SQLiteParameter("instrumentID", p.InstrumentID)
+                , new System.Data.SQLite.SQLiteParameter("vol", p.Vol)
+                , new System.Data.SQLite.SQLiteParameter("lastTime", p.LastTime));
         }
 
         //订单

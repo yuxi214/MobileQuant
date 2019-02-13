@@ -82,7 +82,7 @@ namespace QuantEngine
             }
             catch (Exception ex)
             {
-                Utils.EnginLog(ex.StackTrace);
+                LogUtils.EnginLog(ex.StackTrace);
             }
 
             //加载策略

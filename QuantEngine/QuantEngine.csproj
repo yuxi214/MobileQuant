@@ -78,15 +78,13 @@
   <ItemGroup>
     <Compile Include="Data\Config.cs" />
     <Compile Include="Data\DataManager.cs" />
-    <Compile Include="Data\MessageQueue.cs" />
-    <Compile Include="Data\SqliteHelper.cs" />
+    <Compile Include="Message\MessageQueue.cs" />
+    <Compile Include="Utils\SqliteHelper.cs" />
     <Compile Include="MarketData\CtpMdProvider.cs" />
-    <Compile Include="Message\MessageType.cs" />
     <Compile Include="Trade\CtpTdProvider.cs" />
     <Compile Include="MarketData\IMdProvider.cs" />
     <Compile Include="Trade\Instrument.cs" />
     <Compile Include="Trade\ITdProvider.cs" />
-    <Compile Include="Message\MessageManager.cs" />
     <Compile Include="Trade\Order.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Engine.cs" />
@@ -96,7 +94,8 @@
     <Compile Include="MarketData\ITickFilter.cs" />
     <Compile Include="Trade\Account.cs" />
     <Compile Include="Trade\Position.cs" />
-    <Compile Include="Utils.cs" />
+    <Compile Include="Utils\ConfigUtil.cs" />
+    <Compile Include="Utils\LogUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
