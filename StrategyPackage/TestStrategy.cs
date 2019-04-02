@@ -12,7 +12,7 @@ namespace StrategyPackage
     {
         public override string[] OnLoadInstrument()
         {
-            return new string[] { "ru1901", "TA901", "y1901" };
+            return new string[] { "ru2001", "TA001", "y2001" };
         }
         long count = 1;
         List<Order> orders = new List<Order>();

@@ -78,7 +78,7 @@
   <ItemGroup>
     <Compile Include="Data\Config.cs" />
     <Compile Include="Data\DataManager.cs" />
-    <Compile Include="Message\MessageQueue.cs" />
+    <Compile Include="Utils\MessageQueue.cs" />
     <Compile Include="Utils\SqliteHelper.cs" />
     <Compile Include="MarketData\CtpMdProvider.cs" />
     <Compile Include="Trade\CtpTdProvider.cs" />
@@ -103,6 +103,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="error.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Message\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.109.2\build\net451\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.109.2\build\net451\System.Data.SQLite.Core.targets')" />
