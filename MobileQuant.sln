@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StrategyPackage", "Strategy
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StrategyTools", "StrategyTools\StrategyTools.csproj", "{7624F5AF-7387-4888-8AD6-63547A2E72D2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataReceiver", "DataReceiver\DataReceiver.csproj", "{78815A64-9694-4688-BE51-47671068EE6B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{7624F5AF-7387-4888-8AD6-63547A2E72D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7624F5AF-7387-4888-8AD6-63547A2E72D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7624F5AF-7387-4888-8AD6-63547A2E72D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78815A64-9694-4688-BE51-47671068EE6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78815A64-9694-4688-BE51-47671068EE6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78815A64-9694-4688-BE51-47671068EE6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78815A64-9694-4688-BE51-47671068EE6B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
