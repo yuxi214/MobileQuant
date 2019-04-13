@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace StrategyPackage
+using MoQuant.Framwork.Strategy;
+
+namespace Strategys
 {
-    public class NotStrategy
+    public class TestStrategy2:BaseStrategy
     {
-        int a = 1;
+        int a = 2;
     }
 }

@@ -1,0 +1,25 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+using MoQuant.Framwork.Engine;
+
+namespace MoQuant.Framwork.Broker {
+    public interface ITdProvider
+    {
+        //登陆
+        void Login();
+        //登出
+        void Logout();
+        //是否登陆
+        bool IsLogin();
+        //发送订单
+        void SendOrder(Order order);
+        //撤销订单
+        void CancelOrder(Order order);
+        //获取合约信息
+        bool TryGetInstrument(string instrumentID,out Instrument inst);
+    }
+}

@@ -110,12 +110,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\QuantEngine\QuantEngine.csproj">
-      <Project>{08348f5b-653b-4ba8-8b3e-d795c2f11a57}</Project>
-      <Name>QuantEngine</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="luncher.ico" />
     <Content Include="tools.ico" />
   </ItemGroup>

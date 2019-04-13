@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 using XAPI;
 using XAPI.Callback;
 
-namespace DataReceiver {
+namespace MoQuant.DataReceiver {
     internal class Receiver {
         private XApi mMdApi;
         private XApi mTdApi;

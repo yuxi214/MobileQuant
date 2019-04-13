@@ -9,7 +9,7 @@ using System.Data;
 using MySql.Data;
 using MySql.Data.MySqlClient;
 
-namespace DataReceiver {
+namespace MoQuant.DataReceiver {
     internal class DbHelper {
     }
 

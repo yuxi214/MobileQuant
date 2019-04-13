@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using DotNet.Utilities.时间戳;
 
-namespace DataReceiver {
+namespace MoQuant.Framwork.Engine {
     internal delegate void OnBarDataDelegate(Min1Bar bar);
     internal class BarGenerator {
         //

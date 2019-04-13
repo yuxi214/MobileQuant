@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using QuantEngine;
+using MoQuant.Framwork.Strategy;
 
-namespace StrategyPackage
+namespace Strategys
 {
     public class TestStrategy : BaseStrategy
     {

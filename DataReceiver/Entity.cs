@@ -85,11 +85,12 @@ namespace DataReceiver {
         ///时间
         /// </summary>
         public DateTime UpdateTime;
+
     }
     /// <summary>
     /// bar
     /// </summary>
-    internal class Bar {
+    internal class Min1Bar {
         /// <summary>
         /// 合约代码
         /// </summary>
@@ -119,7 +120,7 @@ namespace DataReceiver {
         /// </summary>
         public double OpenInterest;
         /// <summary>
-        ///时间
+        /// 时间
         /// </summary>
         public DateTime OpenTime;
     }

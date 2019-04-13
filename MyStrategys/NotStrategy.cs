@@ -4,12 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using QuantEngine;
-
-namespace StrategyPackage
+namespace Strategys
 {
-    public class TestStrategy2:BaseStrategy
+    public class NotStrategy
     {
-        int a = 2;
+        int a = 1;
     }
 }
