@@ -14,7 +14,6 @@ namespace MoQuant.Framwork.Strategy {
     {
         public virtual void OnStart() { }
         public virtual void OnStop() { }
-        public virtual string[] OnLoadInstrument() { return new string[] { }; }
         public virtual void OnTick(Tick tick) { }
         public virtual void OnPositionChanged(string instrumentID, int position) { }
     }

@@ -4,9 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using DotNet.Utilities.时间戳;
-
-namespace MoQuant.Framwork.Engine {
+namespace MoQuant.Framwork {
     internal delegate void OnBarDataDelegate(Min1Bar bar);
     internal class BarGenerator {
         //

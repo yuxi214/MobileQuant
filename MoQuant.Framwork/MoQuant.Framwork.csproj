@@ -49,10 +49,14 @@
     <Compile Include="Broker\IMdBroker.cs" />
     <Compile Include="Broker\Instrument.cs" />
     <Compile Include="Broker\ITdBroker.cs" />
-    <Compile Include="Engine\BarGenerator.cs" />
-    <Compile Include="Engine\Order.cs" />
+    <Compile Include="Engine\MessageBus.cs" />
+    <Compile Include="Engine\Message.cs" />
+    <Compile Include="Engine\MessageFilter.cs" />
+    <Compile Include="Framwork\Bar.cs" />
+    <Compile Include="Framwork\BarGenerator.cs" />
+    <Compile Include="Framwork\Order.cs" />
     <Compile Include="Strategy\Position.cs" />
-    <Compile Include="Engine\Tick.cs" />
+    <Compile Include="Framwork\Tick.cs" />
     <Compile Include="Broker\ITickFilter.cs" />
     <Compile Include="Data\DataManager.cs" />
     <Compile Include="Data\LogUtil.cs" />

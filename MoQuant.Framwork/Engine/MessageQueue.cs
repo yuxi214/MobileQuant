@@ -8,63 +8,63 @@ using System.Threading;
 
 using MoQuant.Framwork.Data;
 
-namespace MoQuant.Framwork.Engine{
-    internal class MessageQueue
-    {
-        private BlockingCollection<Message> queue = new BlockingCollection<Message>();
-        private static MessageQueue mInstance;
-        public static MessageQueue Instance
-        {
-            get
-            {
-                if (mInstance == null)
-                {
-                    mInstance = new MessageQueue();
-                }
-
+namespace MoQuant.Framwork.Engine {
+    internal class MessageQueue {
+        private BlockingCollection<Message> mL1Queue = new BlockingCollection<Message>();
+        private BlockingCollection<Message> mL2Queue = new BlockingCollection<Message>();
+        private Thread mL1Thread;
+        private Thread mL2Thread;
+        //
+        private static MessageQueue mInstance = new MessageQueue();
+        public static MessageQueue Instance {
+            get {
                 return mInstance;
             }
         }
-        private MessageQueue()
-        {
-            run();
+
+        private MessageQueue() {
+            start();
         }
 
-        public bool add(MessageType type, object value)
-        {
-            if (queue.Count < 10000)
-            {
-                Message m = new Message(type, value);
-                return queue.TryAdd(m, 1000);
-            }
-            else
-            {
-                return false;
+        public bool post(Message msg) {
+            if (MessageFilter.filterPrior(msg.Type)) {
+                return mL1Queue.TryAdd(msg, 1000);
+            } else {
+                return mL2Queue.TryAdd(msg, 1000);
             }
 
         }
 
-        private Thread mThread;
-        private void run()
-        {
-            if (mThread == null || !mThread.IsAlive)
-            {
-                mThread = new Thread(() =>
-                {
-                    try
-                    {
-                        while (true)
-                        {
-                            Message m = queue.Take();
-                            OnMessage?.Invoke(m);
+        private void start() {
+            //优先线程
+            if (mL1Thread == null || !mL1Thread.IsAlive) {
+                mL1Thread = new Thread(() => {
+                    try {
+                        while (true) {
+                            Message e = mL1Queue.Take();
+                            OnMessage?.Invoke(e);
                         }
-                    }
-                    catch (Exception ex)
-                    {
+                    } catch (Exception ex) {
                         LogUtils.EnginLog(ex.StackTrace);
                     }
                 });
-                mThread.Start();
+                mL1Thread.Priority = ThreadPriority.Highest;
+                mL1Thread.Start();
+            }
+            //非优先线程
+            if (mL2Thread == null || !mL1Thread.IsAlive) {
+                mL2Thread = new Thread(() => {
+                    try {
+                        while (true) {
+                            Message e = mL2Queue.Take();
+                            OnMessage?.Invoke(e);
+                        }
+                    } catch (Exception ex) {
+                        LogUtils.EnginLog(ex.StackTrace);
+                    }
+                });
+                mL2Thread.Priority = ThreadPriority.Lowest;
+                mL2Thread.Start();
             }
 
         }
@@ -72,39 +72,5 @@ namespace MoQuant.Framwork.Engine{
         public event OnMessage OnMessage;
     }
 
-    internal class Message
-    {
-        private MessageType mType;
-        private object mValue;
-
-        public Message(MessageType typeName, object value)
-        {
-            this.mType = typeName;
-            this.mValue = value;
-        }
-
-        public object Value
-        {
-            get
-            {
-                return mValue;
-            }
-        }
-
-        internal MessageType Type
-        {
-            get
-            {
-                return mType;
-            }
-        }
-    }
-    internal enum MessageType
-    {
-        position,
-        order,
-        log
-    }
-
-    internal delegate void OnMessage(Message message);
+    internal delegate void OnMessage(Message msg);
 }

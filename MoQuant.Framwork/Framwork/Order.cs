@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using MoQuant.Framwork.Strategy;
 
-namespace MoQuant.Framwork.Engine {
+namespace MoQuant.Framwork {
     //订单委托
     public delegate void OrderChanged(Order order);
     public class Order

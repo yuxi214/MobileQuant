@@ -13,6 +13,9 @@ using MoQuant.Framwork.Strategy;
 namespace MoQuant.Framwork.Data {
     internal class DataManager
     {
+        private MessageBus<Position> mPositionBus = MessageBus<Position>.getBus();
+        private MessageBus<Order> mOrderBus = MessageBus<Order>.getBus();
+        //
         private static DataManager instance = new DataManager();
         public static DataManager Instance
         {
@@ -23,24 +26,18 @@ namespace MoQuant.Framwork.Data {
         }
         private DataManager()
         {
-            mQueue.OnMessage += _onMessage;
+            mPositionBus.OnMessage += _onPostion;
+            mOrderBus.OnMessage += _onOrder;
         }
 
-        private MessageQueue mQueue = MessageQueue.Instance;
-
-        private void _onMessage(Message message)
+        private void _onPostion(Position position)
         {
-            switch (message.Type)
-            {
-                case MessageType.position:
-                    Position p = (Position)message.Value;
-                    savePosition(p);
-                    break;
-                case MessageType.order:
-                    Order o = (Order)message.Value;
-                    saveOrder(o);
-                    break;
-            }
+            savePosition(position);
+        }
+
+        private void _onOrder(Order order)
+        {
+            saveOrder(order);
         }
 
         //持仓
@@ -52,7 +49,7 @@ namespace MoQuant.Framwork.Data {
         }
         public void SetPosition(Position position)
         {
-            mQueue.add(MessageType.position, position);
+            mPositionBus.post(position);
         }
         private void savePosition(Position p)
         {
@@ -70,7 +67,7 @@ namespace MoQuant.Framwork.Data {
         //订单
         public void AddOrder(Order order)
         {
-            mQueue.add(MessageType.order, order);
+            mQueue.post(MessageType.order, order);
         }
         private void saveOrder(Order o)
         {
