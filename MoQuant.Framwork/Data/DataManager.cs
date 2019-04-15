@@ -11,66 +11,53 @@ using MoQuant.Framwork.Engine;
 using MoQuant.Framwork.Strategy;
 
 namespace MoQuant.Framwork.Data {
-    internal class DataManager
-    {
-        private MessageBus<Position> mPositionBus = MessageBus<Position>.getBus();
-        private MessageBus<Order> mOrderBus = MessageBus<Order>.getBus();
+    internal class DataManager {
+        private MessageHandler<Position> mPositionHandler = MessageBus.CreateHandler<Position>();
+
+        private MessageHandler<Order> mOrderHandler = MessageBus.CreateHandler<Order>();
         //
         private static DataManager instance = new DataManager();
-        public static DataManager Instance
-        {
-            get
-            {
+        public static DataManager Instance {
+            get {
                 return instance;
             }
         }
-        private DataManager()
-        {
-            mPositionBus.OnMessage += _onPostion;
-            mOrderBus.OnMessage += _onOrder;
+        private DataManager() {
+            mPositionHandler.OnMessage += _onPostion;
+            mOrderHandler.OnMessage += _onOrder;
         }
 
-        private void _onPostion(Position position)
-        {
+        private void _onPostion(Position position) {
             savePosition(position);
         }
 
-        private void _onOrder(Order order)
-        {
+        private void _onOrder(Order order) {
             saveOrder(order);
         }
 
         //持仓
-        public int GetPosition(string strategyName, string instrumentID)
-        {
+        public int GetPosition(string strategyName, string instrumentID) {
             string sql = $@" select position from t_position where strategy_name = '{strategyName}' and instrument_id = '{instrumentID}'";
             object vol = SQLiteHelper.ExecuteScalar(sql);
             return vol == null ? 0 : (int)(long)vol;
         }
-        public void SetPosition(Position position)
-        {
-            mPositionBus.post(position);
+        public void SetPosition(Position position) {
+            mPositionHandler.post(position);
         }
-        private void savePosition(Position p)
-        {
+        private void savePosition(Position p) {
             string sql = @"replace into [t_position]
                             ([strategy_name], [instrument_id], [position], [last_time]) 
                             values
                             (@strategyName,@instrumentID,@vol,@lastTime)";
             SQLiteHelper.ExecuteNonQuery(sql
                 , new System.Data.SQLite.SQLiteParameter("strategyName", p.StrategyName)
-                , new System.Data.SQLite.SQLiteParameter("instrumentID", p.InstrumentID)
+                , new System.Data.SQLite.SQLiteParameter("instrumentID", p.InstrumentId)
                 , new System.Data.SQLite.SQLiteParameter("vol", p.Vol)
                 , new System.Data.SQLite.SQLiteParameter("lastTime", p.LastTime));
         }
 
         //订单
-        public void AddOrder(Order order)
-        {
-            mQueue.post(MessageType.order, order);
-        }
-        private void saveOrder(Order o)
-        {
+        private void saveOrder(Order o) {
             string direction = o.Direction == DirectionType.Buy ? "多" : "空";
             string sql = $@"insert into [t_order]
                             ([strategy_name], [instrument_id], [direction], [price], [volume], [volume_traded], [order_time])

@@ -1,33 +1,80 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
+
+using MoQuant.Framwork.Data;
 
 namespace MoQuant.Framwork.Engine {
-    internal class MessageBus<T> {
-        private static MessageQueue mMessageQueue = MessageQueue.Instance;
-        public event OnMessageDelegate OnMessage;
-
-        private MessageBus() {
-            mMessageQueue.OnMessage += onReceiveMessage;
-        }
-
-        public static MessageBus<T> getBus() {
-            return new MessageBus<T>();
-        }
-
-        private void onReceiveMessage(Message msg) {
-            if (msg.Type == typeof(T)) {
-                OnMessage?.Invoke((T)msg.Value);
+    internal class MessageBus {
+        private BlockingCollection<Message> mL1Queue = new BlockingCollection<Message>();
+        private BlockingCollection<Message> mL2Queue = new BlockingCollection<Message>();
+        private Thread mL1Thread;
+        private Thread mL2Thread;
+        //
+        private static MessageBus mInstance = new MessageBus();
+        public static MessageBus Instance {
+            get {
+                return mInstance;
             }
         }
 
-        internal void post(T value) {
-            Message msg = new Message(typeof(T), value);
-            mMessageQueue.post(msg);
+        private MessageBus() {
+            start();
         }
 
-        public delegate void OnMessageDelegate(T value);
+        public bool post(Message msg) {
+            if (MessageFilter.filterPrior(msg.Type)) {
+                return mL1Queue.TryAdd(msg, 1000);
+            } else {
+                return mL2Queue.TryAdd(msg, 1000);
+            }
+
+        }
+
+        private void start() {
+            //优先线程
+            if (mL1Thread == null || !mL1Thread.IsAlive) {
+                mL1Thread = new Thread(() => {
+                    try {
+                        while (true) {
+                            Message e = mL1Queue.Take();
+                            OnMessage?.Invoke(e);
+                        }
+                    } catch (Exception ex) {
+                        LogUtils.EnginLog(ex.StackTrace);
+                    }
+                });
+                mL1Thread.Priority = ThreadPriority.Highest;
+                mL1Thread.Start();
+            }
+            //非优先线程
+            if (mL2Thread == null || !mL1Thread.IsAlive) {
+                mL2Thread = new Thread(() => {
+                    try {
+                        while (true) {
+                            Message e = mL2Queue.Take();
+                            OnMessage?.Invoke(e);
+                        }
+                    } catch (Exception ex) {
+                        LogUtils.EnginLog(ex.StackTrace);
+                    }
+                });
+                mL2Thread.Priority = ThreadPriority.Lowest;
+                mL2Thread.Start();
+            }
+
+        }
+
+        public event OnMessage OnMessage;
+
+        public static MessageHandler<T> CreateHandler<T>() {
+            return new MessageHandler<T>(mInstance);
+        }
     }
+
+    internal delegate void OnMessage(Message msg);
 }

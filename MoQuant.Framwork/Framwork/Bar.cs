@@ -23,73 +23,64 @@ namespace MoQuant.Framwork {
         // 开始时间
         private DateTime mBeginTime;
         // 长度
-        private long mSize;
+        private BarSizeType mSizeType;
 
-        public Bar(string instrumentId, double openPrice, double highPrice, double lowPrice, double closePrice, long volume, double openInterest, DateTime beginTime, long size)
-        {
-            mInstrumentID = instrumentId;
-            mOpenPrice = openPrice;
-            mHighPrice = highPrice;
-            mLowPrice = lowPrice;
-            mClosePrice = closePrice;
-            mVolume = volume;
-            mOpenInterest = openInterest;
-            mBeginTime = beginTime;
-            mSize = size;
-        }
-
-        public string InstrumentId
-        {
+        public string InstrumentId {
             get { return mInstrumentID; }
-            set { mInstrumentID = value; }
+            internal set { mInstrumentID = value; }
         }
 
-        public double OpenPrice
-        {
+        public double OpenPrice {
             get { return mOpenPrice; }
-            set { mOpenPrice = value; }
+            internal set { mOpenPrice = value; }
         }
 
-        public double HighPrice
-        {
+        public double HighPrice {
             get { return mHighPrice; }
-            set { mHighPrice = value; }
+            internal set { mHighPrice = value; }
         }
 
-        public double LowPrice
-        {
+        public double LowPrice {
             get { return mLowPrice; }
-            set { mLowPrice = value; }
+            internal set { mLowPrice = value; }
         }
 
-        public double ClosePrice
-        {
+        public double ClosePrice {
             get { return mClosePrice; }
-            set { mClosePrice = value; }
+            internal set { mClosePrice = value; }
         }
 
-        public long Volume
-        {
+        public long Volume {
             get { return mVolume; }
-            set { mVolume = value; }
+            internal set { mVolume = value; }
         }
 
-        public double OpenInterest
-        {
+        public double OpenInterest {
             get { return mOpenInterest; }
-            set { mOpenInterest = value; }
+            internal set { mOpenInterest = value; }
         }
 
-        public DateTime BeginTime
-        {
+        public DateTime BeginTime {
             get { return mBeginTime; }
-            set { mBeginTime = value; }
+            internal set { mBeginTime = value; }
         }
 
-        public long Size
+        public BarSizeType SizeType
         {
-            get { return mSize; }
-            set { mSize = value; }
+            get { return mSizeType; }
+            internal set { mSizeType = value; }
         }
+    }
+
+    public enum BarSizeType {
+        Min1 = 1,
+        Min5 = 5,
+        Min10 = 10,
+        Min20 = 20,
+        Min30 = 30,
+        Hour1 = 60,
+        Hour2 = 120,
+        Hour4 = 240,
+        Day1 = 1440
     }
 }
