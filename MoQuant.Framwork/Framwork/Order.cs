@@ -9,12 +9,11 @@ using MoQuant.Framwork.Strategy;
 namespace MoQuant.Framwork {
     //订单委托
     public delegate void OrderChanged(Order order);
-    public class Order
-    {
+    public class Order {
         //策略
         private BaseStrategy mStrategy;
         //合约
-        private string mInstrumentID = string.Empty;
+        private Instrument mInstrument;
         //买卖
         private DirectionType mDirection = DirectionType.Buy;
         //报价
@@ -35,10 +34,9 @@ namespace MoQuant.Framwork {
         //事件
         public event OrderChanged OnChanged;
 
-        public Order(BaseStrategy strategy, string instrumentID, DirectionType direction, double price, int volume)
-        {
+        public Order(BaseStrategy strategy, Instrument instrument, DirectionType direction, double price, int volume) {
             this.mStrategy = strategy;
-            this.mInstrumentID = instrumentID;
+            this.mInstrument = instrument;
             this.mDirection = direction;
             this.mPrice = price;
             this.mOrderTime = DateTime.Now;
@@ -48,89 +46,68 @@ namespace MoQuant.Framwork {
         }
 
         //
-        public string InstrumentID
-        {
-            get
-            {
-                return mInstrumentID;
+        public Instrument Instrument {
+            get {
+                return mInstrument;
             }
         }
 
-        public DirectionType Direction
-        {
-            get
-            {
+        public DirectionType Direction {
+            get {
                 return mDirection;
             }
         }
 
-        public double Price
-        {
-            internal set
-            {
+        public double Price {
+            internal set {
                 mPrice = value;
             }
-            get
-            {
+            get {
                 return mPrice;
             }
         }
 
-        public int Volume
-        {
-            get
-            {
+        public int Volume {
+            get {
                 return mVolume;
             }
         }
 
-        public int VolumeLeft
-        {
-            get
-            {
+        public int VolumeLeft {
+            get {
                 return mVolumeLeft;
             }
         }
 
-        public OrderStatus Status
-        {
-            get
-            {
+        public OrderStatus Status {
+            get {
                 return mStatus;
             }
         }
 
-        public DateTime OrderTime
-        {
-            get
-            {
+        public DateTime OrderTime {
+            get {
                 return mOrderTime;
             }
         }
 
-        public BaseStrategy Strategy
-        {
-            get
-            {
+        public BaseStrategy Strategy {
+            get {
                 return mStrategy;
             }
         }
 
-        internal List<SubOrder> SubOrders
-        {
-            get
-            {
+        internal List<SubOrder> SubOrders {
+            get {
                 return mSubOrders;
             }
         }
 
         //
-        internal void AddSubOrder(SubOrder o)
-        {
+        internal void AddSubOrder(SubOrder o) {
             mSubOrders.Add(o);
         }
-        internal void RefreshSubOrders()
-        {
+        internal void RefreshSubOrders() {
             if (mSubOrders == null)
                 return;
             if (mStatus == OrderStatus.Canceled)
@@ -153,14 +130,12 @@ namespace MoQuant.Framwork {
             /*统计，这个地方有点复杂，会出现子订单一个正常，一个错误，一个撤单这种情况，
              * partial>normal>canceled
              */
-            foreach (SubOrder sOrder in mSubOrders)
-            {
+            foreach (SubOrder sOrder in mSubOrders) {
                 //
                 left += sOrder.VolumeLeft;
                 traded += sOrder.VolumeTraded;
                 //
-                switch (sOrder.Status)
-                {
+                switch (sOrder.Status) {
                     case OrderStatus.Normal:
                         normalCount++;
                         break;
@@ -184,37 +159,24 @@ namespace MoQuant.Framwork {
             mVolumeTraded = traded;
 
             //策略持仓调整
-            if (currentTrade > 0)
-            {
-                if (mDirection == DirectionType.Buy)
-                {
-                    mStrategy.AddPosition(mInstrumentID, currentTrade);
-                }
-                else
-                {
-                    mStrategy.AddPosition(mInstrumentID, -currentTrade);
+            if (currentTrade > 0) {
+                if (mDirection == DirectionType.Buy) {
+                    mStrategy.AddPosition(mInstrument, currentTrade);
+                } else {
+                    mStrategy.AddPosition(mInstrument, -currentTrade);
                 }
             }
 
             //状态
-            if (partialCount > 0)
-            {
+            if (partialCount > 0) {
                 mStatus = OrderStatus.Partial;
-            }
-            else if (normalCount > 0)
-            {
+            } else if (normalCount > 0) {
                 mStatus = OrderStatus.Normal;
-            }
-            else if (filledCount == mSubOrders.Count)
-            {
+            } else if (filledCount == mSubOrders.Count) {
                 mStatus = OrderStatus.Filled;
-            }
-            else if (errorCount == mSubOrders.Count)
-            {
+            } else if (errorCount == mSubOrders.Count) {
                 mStatus = OrderStatus.Error;
-            }
-            else
-            {
+            } else {
                 mStatus = OrderStatus.Canceled;
             }
 
@@ -224,19 +186,16 @@ namespace MoQuant.Framwork {
         }
 
         //发送订单
-        public void Send()
-        {
+        public void Send() {
             mStrategy.SendOrder(this);
         }
 
-        public void Cancle()
-        {
+        public void Cancle() {
             mStrategy.CancleOrder(this);
         }
     }
 
-    internal class SubOrder
-    {
+    internal class SubOrder {
         //合并订单
         private Order pOrder;
 
@@ -273,8 +232,7 @@ namespace MoQuant.Framwork {
         // 状态
         private OrderStatus status;
 
-        public SubOrder(Order pOrder, string instrumentID, DirectionType direction, OffsetType offset, double limitPrice, DateTime insertTime, int volume, int volumeLeft, OrderStatus status)
-        {
+        public SubOrder(Order pOrder, string instrumentID, DirectionType direction, OffsetType offset, double limitPrice, DateTime insertTime, int volume, int volumeLeft, OrderStatus status) {
             this.pOrder = pOrder;
             this.instrumentID = instrumentID;
             this.direction = direction;
@@ -286,138 +244,107 @@ namespace MoQuant.Framwork {
             this.status = status;
         }
 
-        internal void Refresh()
-        {
+        internal void Refresh() {
             pOrder.RefreshSubOrders();
         }
 
-        public string OrderID
-        {
-            get
-            {
+        public string OrderID {
+            get {
                 return orderID;
             }
 
-            set
-            {
+            set {
                 orderID = value;
             }
         }
 
-        public string InstrumentID
-        {
-            get
-            {
+        public string InstrumentID {
+            get {
                 return instrumentID;
             }
 
-            set
-            {
+            set {
                 instrumentID = value;
             }
         }
 
-        public DirectionType Direction
-        {
-            get
-            {
+        public DirectionType Direction {
+            get {
                 return direction;
             }
 
-            set
-            {
+            set {
                 direction = value;
             }
         }
 
-        public OffsetType Offset
-        {
-            get
-            {
+        public OffsetType Offset {
+            get {
                 return offset;
             }
 
-            set
-            {
+            set {
                 offset = value;
             }
         }
 
-        public double LimitPrice
-        {
-            get
-            {
+        public double LimitPrice {
+            get {
                 return limitPrice;
             }
 
-            set
-            {
+            set {
                 limitPrice = value;
             }
         }
 
-        public int Volume
-        {
-            get
-            {
+        public int Volume {
+            get {
                 return volume;
             }
         }
 
-        public int VolumeLeft
-        {
-            get
-            {
+        public int VolumeLeft {
+            get {
                 return volumeLeft;
             }
-            set
-            {
+            set {
                 volumeLeft = value;
             }
         }
 
-        public OrderStatus Status
-        {
-            get
-            {
+        public OrderStatus Status {
+            get {
                 return status;
             }
 
-            set
-            {
+            set {
                 status = value;
             }
         }
 
-        public int CustomID
-        {
-            get
-            {
+        public int CustomID {
+            get {
                 return customID;
             }
 
-            set
-            {
+            set {
                 customID = value;
             }
         }
 
-        public int VolumeTraded
-        {
-            get
-            {
+        public int VolumeTraded {
+            get {
                 return volumeTraded;
             }
 
-            set
-            {
+            set {
                 volumeTraded = value;
             }
         }
     }
 
-    public enum DirectionType
-    {
+    public enum DirectionType {
         /// <summary>
         /// 买
         /// </summary>
@@ -429,8 +356,7 @@ namespace MoQuant.Framwork {
         Sell
     }
 
-    public enum OrderStatus
-    {
+    public enum OrderStatus {
         /// <summary>
         /// 委托
         /// </summary>
@@ -453,8 +379,7 @@ namespace MoQuant.Framwork {
         Error
     }
 
-    public enum OffsetType
-    {
+    public enum OffsetType {
         /// <summary>
         /// 开仓
         /// </summary>

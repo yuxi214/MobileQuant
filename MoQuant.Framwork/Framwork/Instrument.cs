@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MoQuant.Framwork.Broker {
+namespace MoQuant.Framwork {
     public class Instrument
     {
 		/// 合约代码

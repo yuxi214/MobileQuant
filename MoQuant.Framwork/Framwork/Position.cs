@@ -3,37 +3,40 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MoQuant.Framwork.Strategy;
 
 namespace MoQuant.Framwork {
-    public class Position
-    {
-        private string mStrategyName;
-        private string mInstrumentID;
-        private int mVol = 0;
+    public class Position {
+        private BaseStrategy mStrategy;
+        private Instrument mInstrument;
+        private long mVol = 0;
         private DateTime mLastTime;
 
-        public string StrategyName
-        {
-            get { return mStrategyName; }
-            set { mStrategyName = value; }
+        public Position(BaseStrategy strategy, Instrument instrument, long vol, DateTime lastTime) {
+            mStrategy = strategy;
+            mInstrument = instrument;
+            mVol = vol;
+            mLastTime = lastTime;
         }
 
-        public string InstrumentId
-        {
-            get { return mInstrumentID; }
-            set { mInstrumentID = value; }
+        public BaseStrategy StrategyName {
+            get { return mStrategy; }
+            internal set { mStrategy = value; }
         }
 
-        public int Vol
-        {
+        public Instrument Instrument {
+            get { return mInstrument; }
+            internal set { mInstrument = value; }
+        }
+
+        public long Vol {
             get { return mVol; }
-            set { mVol = value; }
+            internal set { mVol = value; }
         }
 
-        public DateTime LastTime
-        {
+        public DateTime LastTime {
             get { return mLastTime; }
-            set { mLastTime = value; }
+            internal set { mLastTime = value; }
         }
     }
 }

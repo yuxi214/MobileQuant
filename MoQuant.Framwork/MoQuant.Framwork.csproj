@@ -48,7 +48,7 @@
   <ItemGroup>
     <Compile Include="Broker\BrokerManager.cs" />
     <Compile Include="Broker\IMdBroker.cs" />
-    <Compile Include="Broker\Instrument.cs" />
+    <Compile Include="Framwork\Instrument.cs" />
     <Compile Include="Broker\ITdBroker.cs" />
     <Compile Include="Engine\MessageHandler.cs" />
     <Compile Include="Engine\Message.cs" />
@@ -57,6 +57,7 @@
     <Compile Include="Framwork\BarGenerator.cs" />
     <Compile Include="Framwork\Order.cs" />
     <Compile Include="Framwork\Position.cs" />
+    <Compile Include="Framwork\Request.cs" />
     <Compile Include="Framwork\Tick.cs" />
     <Compile Include="Broker\ITickFilter.cs" />
     <Compile Include="Data\DataManager.cs" />
