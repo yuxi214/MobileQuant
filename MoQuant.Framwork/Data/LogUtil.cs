@@ -10,7 +10,7 @@ using MoQuant.Framwork.Engine;
 
 namespace MoQuant.Framwork.Data {
     public class LogUtils {
-        private static MessageHandler<Log> mHandler = MessageBus.CreateHandler<Log>();
+        private static MessageHandler<Log> mHandler = EventQueue.CreateHandler<Log>();
         //
         static LogUtils() {
             mHandler.OnMessage += _onLog;

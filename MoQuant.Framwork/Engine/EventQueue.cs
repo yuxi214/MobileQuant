@@ -9,25 +9,26 @@ using System.Threading;
 using MoQuant.Framwork.Data;
 
 namespace MoQuant.Framwork.Engine {
-    internal class MessageBus {
-        private BlockingCollection<Message> mL1Queue = new BlockingCollection<Message>();
-        private BlockingCollection<Message> mL2Queue = new BlockingCollection<Message>();
+    internal class EventQueue {
+        private BlockingCollection<Event> mL1Queue = new BlockingCollection<Event>();
+        private BlockingCollection<Event> mL2Queue = new BlockingCollection<Event>();
         private Thread mL1Thread;
         private Thread mL2Thread;
+        private EventFilter mFilter = new EventFilter();
         //
-        private static MessageBus mInstance = new MessageBus();
-        public static MessageBus Instance {
+        private static EventQueue mInstance = new EventQueue();
+        public static EventQueue Instance {
             get {
                 return mInstance;
             }
         }
 
-        private MessageBus() {
+        private EventQueue() {
             start();
         }
 
-        public bool post(Message msg) {
-            if (MessageFilter.filterPrior(msg.Type)) {
+        public bool post(Event msg) {
+            if (mFilter.filterPrior(msg.ValueType)) {
                 return mL1Queue.TryAdd(msg, 1000);
             } else {
                 return mL2Queue.TryAdd(msg, 1000);
@@ -41,7 +42,7 @@ namespace MoQuant.Framwork.Engine {
                 mL1Thread = new Thread(() => {
                     try {
                         while (true) {
-                            Message e = mL1Queue.Take();
+                            Event e = mL1Queue.Take();
                             OnMessage?.Invoke(e);
                         }
                     } catch (Exception ex) {
@@ -56,7 +57,7 @@ namespace MoQuant.Framwork.Engine {
                 mL2Thread = new Thread(() => {
                     try {
                         while (true) {
-                            Message e = mL2Queue.Take();
+                            Event e = mL2Queue.Take();
                             OnMessage?.Invoke(e);
                         }
                     } catch (Exception ex) {
@@ -69,12 +70,8 @@ namespace MoQuant.Framwork.Engine {
 
         }
 
-        public event OnMessage OnMessage;
-
-        public static MessageHandler<T> CreateHandler<T>() {
-            return new MessageHandler<T>(mInstance);
-        }
+        public event OnMessageDelegate OnMessage;
     }
 
-    internal delegate void OnMessage(Message msg);
+    internal delegate void OnMessageDelegate(Event msg);
 }

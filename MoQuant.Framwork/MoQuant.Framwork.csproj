@@ -48,11 +48,12 @@
   <ItemGroup>
     <Compile Include="Broker\BrokerManager.cs" />
     <Compile Include="Broker\IMdBroker.cs" />
+    <Compile Include="Engine\EventBus.cs" />
+    <Compile Include="Engine\Request.cs" />
     <Compile Include="Framwork\Instrument.cs" />
     <Compile Include="Broker\ITdBroker.cs" />
-    <Compile Include="Engine\MessageHandler.cs" />
-    <Compile Include="Engine\Message.cs" />
-    <Compile Include="Engine\MessageFilter.cs" />
+    <Compile Include="Engine\Event.cs" />
+    <Compile Include="Engine\EventFilter.cs" />
     <Compile Include="Framwork\Bar.cs" />
     <Compile Include="Framwork\BarGenerator.cs" />
     <Compile Include="Framwork\Order.cs" />
@@ -63,7 +64,7 @@
     <Compile Include="Data\DataManager.cs" />
     <Compile Include="Data\LogUtil.cs" />
     <Compile Include="Data\SqliteHelper.cs" />
-    <Compile Include="Engine\MessageBus.cs" />
+    <Compile Include="Engine\EventQueue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Strategy\BaseStrategy.cs" />
     <Compile Include="Strategy\StrategyManager.cs" />

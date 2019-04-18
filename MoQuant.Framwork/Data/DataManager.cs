@@ -12,9 +12,9 @@ using MoQuant.Framwork.Strategy;
 
 namespace MoQuant.Framwork.Data {
     internal class DataManager {
-        private MessageHandler<Position> mPositionHandler = MessageBus.CreateHandler<Position>();
+        private MessageHandler<Position> mPositionHandler = EventQueue.CreateHandler<Position>();
 
-        private MessageHandler<Order> mOrderHandler = MessageBus.CreateHandler<Order>();
+        private MessageHandler<Order> mOrderHandler = EventQueue.CreateHandler<Order>();
         //
         private static DataManager instance = new DataManager();
         public static DataManager Instance {
